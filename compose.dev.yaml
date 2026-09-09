@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    environment:
+      Db__ConnString: "Host=db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB}"
+      ASPNETCORE_ENVIRONMENT: Development
+      # force this port by injecting it into env vars instead of relying on launch settings profile
+      # actually this only works for when environment is not Development, because when it is, launch settings
+      # takes priority unless you specify --no-launch-profile
+      ASPNETCORE_URLS: "http://+:8080" 
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/App
+      - /App/src/Domain/obj
+      - /App/src/Domain/bin
+      - /App/src/Application/obj
+      - /App/src/Application/bin
+      - /App/src/Infrastructure/obj
+      - /App/src/Infrastructure/bin
+      - /App/src/Presentation/obj
+      - /App/src/Presentation/bin
+
+
