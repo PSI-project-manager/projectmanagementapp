@@ -12,7 +12,7 @@
       nixpkgs,
       flake-utils,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ] (
       system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -39,6 +39,7 @@
           shellHook = ''
             pnpm --dir frontend install --frozen-lockfile
             dotnet restore backend
+            dotnet tool restore --tool-manifest backend/dotnet-tools.json
             echo "backend:  dotnet $(dotnet --version)"
             echo "frontend: node $(node --version) / pnpm $(pnpm --version)"
           '';
