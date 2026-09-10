@@ -22,5 +22,15 @@ services:
       - /App/src/Infrastructure/bin
       - /App/src/Presentation/obj
       - /App/src/Presentation/bin
+  services:
+    frontend:
+      build: ./frontend
+      ports:
+        - "5173:5173"
+      volumes:
+        - ./frontend:/app          # host source -> container (live edits)
+        - /app/node_modules        # anonymous volume: shields container deps
+      environment:
+        - CHOKIDAR_USEPOLLING=1     # drop if hot-reload already works
 
 
