@@ -1,8 +1,19 @@
 # Development: dev environment
 
-TODO: explain how to eneter the created dev environment (Pijus)
+Install Nix determinate installer from `https://docs.determinate.systems/`
+
+Open a new shell and run `nix develop` from project root to enter the devshell which is already
+preconfigured to have the dotnet 10 sdk, node 22 and pnmp.
+
+Run `dotnet restore` from `backend/` to install dotnet managed deps
+
+Run `pnpm install --frozen-lockfile` from `frontend/` to install node managed deps
 
 # Development: branching strategy
+
+IMPORTANT:
+
+- Never rewrite history that has already been pushed to a shared branch
 
 At the start of every sprint:
 
@@ -68,8 +79,6 @@ Other documentation in `docs/`
   scaffold), also add a healthcheck to db service and depends_on to backend so that backend only
   starts when db is healthy, add the `db/schema.sql` as an entrypoint script that the db container
   executes on volume creation (only re runs it if the db data dir is empty) (Pijus)
-- Setup GitHub projects with user stories (Andrius)
-- Design UI (Justinas)
 - Create GitHub workflows for linting and formatting checks on PR/push (Roslyn, CSharpier) (Azuolas)
 - Outline clean architecture rules in docs (Azuolas)
 

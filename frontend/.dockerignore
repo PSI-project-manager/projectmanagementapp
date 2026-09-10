@@ -1,0 +1,37 @@
+# 1. Local dependencies & Virtual Environments
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+
+# 2. Build outputs & Cache
+dist/
+build/
+.next/
+.nuxt/
+.remix/
+.cache/
+.parcel-cache/
+
+# 3. Environment variables & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# 4. Git & Version Control
+.git
+.gitignore
+.github/
+
+# 5. IDEs, OS files & Logs
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
