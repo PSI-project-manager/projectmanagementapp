@@ -3,9 +3,15 @@ using FluentValidation;
 
 namespace Application.Projects;
 
-public sealed class CreateProjectHandler(IProjectRepository projects, IValidator<CreateProjectRequest> validator)
+public sealed class CreateProjectHandler(
+    IProjectRepository projects,
+    IValidator<CreateProjectRequest> validator
+)
 {
-    public async Task<ProjectDto> HandleAsync(CreateProjectRequest request, CancellationToken cancellationToken = default)
+    public async Task<ProjectDto> HandleAsync(
+        CreateProjectRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 

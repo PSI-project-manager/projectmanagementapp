@@ -10,13 +10,22 @@ public class ListProjectsHandlerTests
     public async Task HandleAsync_ReturnsOnlyProjectsForRequestedOrganization()
     {
         var repository = new FakeProjectRepository();
-        var createHandler = new CreateProjectHandler(repository, new CreateProjectRequestValidator());
+        var createHandler = new CreateProjectHandler(
+            repository,
+            new CreateProjectRequestValidator()
+        );
         var organizationId = Guid.NewGuid();
         var otherOrganizationId = Guid.NewGuid();
 
-        await createHandler.HandleAsync(new CreateProjectRequest(organizationId, "Project A", null));
-        await createHandler.HandleAsync(new CreateProjectRequest(organizationId, "Project B", null));
-        await createHandler.HandleAsync(new CreateProjectRequest(otherOrganizationId, "Project C", null));
+        await createHandler.HandleAsync(
+            new CreateProjectRequest(organizationId, "Project A", null)
+        );
+        await createHandler.HandleAsync(
+            new CreateProjectRequest(organizationId, "Project B", null)
+        );
+        await createHandler.HandleAsync(
+            new CreateProjectRequest(otherOrganizationId, "Project C", null)
+        );
 
         var handler = new ListProjectsHandler(repository);
         var result = await handler.HandleAsync(organizationId);

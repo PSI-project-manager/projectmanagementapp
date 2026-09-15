@@ -11,12 +11,15 @@ public class UpdateProjectHandlerTests
     public async Task HandleAsync_WithValidRequest_PersistsChanges()
     {
         var repository = new FakeProjectRepository();
-        var created = await new CreateProjectHandler(repository, new CreateProjectRequestValidator()).HandleAsync(
-            new CreateProjectRequest(Guid.NewGuid(), "Old Name", "Old description")
-        );
+        var created = await new CreateProjectHandler(
+            repository,
+            new CreateProjectRequestValidator()
+        ).HandleAsync(new CreateProjectRequest(Guid.NewGuid(), "Old Name", "Old description"));
         var handler = new UpdateProjectHandler(repository, new UpdateProjectRequestValidator());
 
-        var result = await handler.HandleAsync(new UpdateProjectRequest(created.Id, "New Name", "New description"));
+        var result = await handler.HandleAsync(
+            new UpdateProjectRequest(created.Id, "New Name", "New description")
+        );
 
         Assert.Equal("New Name", result.Name);
         Assert.Equal("New description", result.Description);
@@ -28,8 +31,8 @@ public class UpdateProjectHandlerTests
         var repository = new FakeProjectRepository();
         var handler = new UpdateProjectHandler(repository, new UpdateProjectRequestValidator());
 
-        await Assert.ThrowsAsync<KeyNotFoundException>(
-            () => handler.HandleAsync(new UpdateProjectRequest(Guid.NewGuid(), "Name", null))
+        await Assert.ThrowsAsync<KeyNotFoundException>(() =>
+            handler.HandleAsync(new UpdateProjectRequest(Guid.NewGuid(), "Name", null))
         );
     }
 
@@ -37,13 +40,14 @@ public class UpdateProjectHandlerTests
     public async Task HandleAsync_WithMissingName_ThrowsValidationException()
     {
         var repository = new FakeProjectRepository();
-        var created = await new CreateProjectHandler(repository, new CreateProjectRequestValidator()).HandleAsync(
-            new CreateProjectRequest(Guid.NewGuid(), "Old Name", null)
-        );
+        var created = await new CreateProjectHandler(
+            repository,
+            new CreateProjectRequestValidator()
+        ).HandleAsync(new CreateProjectRequest(Guid.NewGuid(), "Old Name", null));
         var handler = new UpdateProjectHandler(repository, new UpdateProjectRequestValidator());
 
-        await Assert.ThrowsAsync<ValidationException>(
-            () => handler.HandleAsync(new UpdateProjectRequest(created.Id, "", null))
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            handler.HandleAsync(new UpdateProjectRequest(created.Id, "", null))
         );
     }
 }

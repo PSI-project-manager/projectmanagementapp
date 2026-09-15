@@ -9,7 +9,9 @@ public sealed class CreateProjectRequestValidator : AbstractValidator<CreateProj
 {
     public CreateProjectRequestValidator()
     {
-        RuleFor(x => x.OrganizationId).NotEmpty().WithMessage("A project must belong to an organization.");
+        RuleFor(x => x.OrganizationId)
+            .NotEmpty()
+            .WithMessage("A project must belong to an organization.");
 
         RuleFor(x => x.Name)
             .NotEmpty()

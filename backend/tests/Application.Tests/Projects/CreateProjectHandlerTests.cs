@@ -31,8 +31,8 @@ public class CreateProjectHandlerTests
         var repository = new FakeProjectRepository();
         var handler = new CreateProjectHandler(repository, new CreateProjectRequestValidator());
 
-        await Assert.ThrowsAsync<ValidationException>(
-            () => handler.HandleAsync(new CreateProjectRequest(Guid.NewGuid(), "", null))
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            handler.HandleAsync(new CreateProjectRequest(Guid.NewGuid(), "", null))
         );
     }
 
@@ -42,8 +42,8 @@ public class CreateProjectHandlerTests
         var repository = new FakeProjectRepository();
         var handler = new CreateProjectHandler(repository, new CreateProjectRequestValidator());
 
-        await Assert.ThrowsAsync<ValidationException>(
-            () => handler.HandleAsync(new CreateProjectRequest(Guid.Empty, "Name", null))
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            handler.HandleAsync(new CreateProjectRequest(Guid.Empty, "Name", null))
         );
     }
 }

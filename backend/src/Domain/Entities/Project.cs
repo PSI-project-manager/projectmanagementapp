@@ -15,7 +15,10 @@ public sealed class Project
     public Project(Guid organizationId, string name, string? description = null)
     {
         if (organizationId == Guid.Empty)
-            throw new ArgumentException("A project must belong to an organization.", nameof(organizationId));
+            throw new ArgumentException(
+                "A project must belong to an organization.",
+                nameof(organizationId)
+            );
 
         Id = Guid.NewGuid();
         OrganizationId = organizationId;
@@ -38,7 +41,10 @@ public sealed class Project
 
         var trimmed = name.Trim();
         if (trimmed.Length > MaxNameLength)
-            throw new ArgumentException($"Project name cannot exceed {MaxNameLength} characters.", nameof(name));
+            throw new ArgumentException(
+                $"Project name cannot exceed {MaxNameLength} characters.",
+                nameof(name)
+            );
 
         Name = trimmed;
     }

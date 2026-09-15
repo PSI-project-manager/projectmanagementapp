@@ -18,7 +18,9 @@ internal sealed class FakeProjectRepository : IProjectRepository
         CancellationToken cancellationToken = default
     )
     {
-        IReadOnlyList<Project> result = _projects.Values.Where(p => p.OrganizationId == organizationId).ToList();
+        IReadOnlyList<Project> result = _projects
+            .Values.Where(p => p.OrganizationId == organizationId)
+            .ToList();
         return Task.FromResult(result);
     }
 

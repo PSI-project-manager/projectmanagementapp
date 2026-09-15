@@ -2,9 +2,15 @@ using FluentValidation;
 
 namespace Application.Projects;
 
-public sealed class UpdateProjectHandler(IProjectRepository projects, IValidator<UpdateProjectRequest> validator)
+public sealed class UpdateProjectHandler(
+    IProjectRepository projects,
+    IValidator<UpdateProjectRequest> validator
+)
 {
-    public async Task<ProjectDto> HandleAsync(UpdateProjectRequest request, CancellationToken cancellationToken = default)
+    public async Task<ProjectDto> HandleAsync(
+        UpdateProjectRequest request,
+        CancellationToken cancellationToken = default
+    )
     {
         await validator.ValidateAndThrowAsync(request, cancellationToken);
 
