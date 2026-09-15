@@ -6,7 +6,6 @@ Install Nix determinate installer from `https://docs.determinate.systems/`
 
 Open a new shell and run `nix develop` from project root
 
-
 ## Set it up yourself
 
 ### Pre-setup
@@ -48,6 +47,5 @@ docker compose -f compose.dev.yaml up --build -V --renew-anon-volumes
 
 # TODO
 
-- Set-up linter
 - Outline clean architecture rules in docs (Azuolas)
 - Add .editorconfig for linter settings (Azuolas)
