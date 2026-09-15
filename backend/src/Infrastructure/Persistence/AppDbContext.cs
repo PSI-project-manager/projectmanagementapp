@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Infrastructure.Persistence.Entities;
+using Infrastructure.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;

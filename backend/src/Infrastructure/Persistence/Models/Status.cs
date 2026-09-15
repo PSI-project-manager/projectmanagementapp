@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Infrastructure.Persistence.Entities;
+namespace Infrastructure.Persistence.Models;
 
-public partial class Itemtype
+public partial class Status
 {
-    public int Itemtypeid { get; set; }
+    public int Statusid { get; set; }
 
     public string Name { get; set; } = null!;
+
+    public int Sortorder { get; set; }
 
     public bool Isactive { get; set; }
 
