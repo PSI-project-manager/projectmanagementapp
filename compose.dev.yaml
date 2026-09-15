@@ -19,6 +19,10 @@ services:
       - /App/src/Infrastructure/bin
       - /App/src/Presentation/obj
       - /App/src/Presentation/bin
+    depends_on: 
+      db:
+        condition: service_healthy
+
   frontend:
     build:
       context: ./frontend
@@ -28,3 +32,23 @@ services:
     volumes:
       - ./frontend:/App:z
       - /App/node_modules
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # necessary for scaffolding
+    ports:
+      - "5432:5432"
+    volumes:
+      - projectmanagementapp_pgdata:/var/lib/postgresql/
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+    
+volumes:
+  projectmanagementapp_pgdata:
