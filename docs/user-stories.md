@@ -1,19 +1,3 @@
-# Backlog Structure — Issue Tracker Project
-
-## Sprint Plan
-
-| Sprint | User Stories | Note |
-|---|---|---|
-| Sprint 1 | US-01, US-03, US-05, US-07 | Independent base stories — no cross-dependencies within the sprint |
-| Sprint 2 | US-08, US-02, US-04, US-09 | US-09 depends on US-08 (same sprint) — close US-08 early in the sprint before starting US-09 |
-| Sprint 3 | US-06, US-10, US-11, US-12 | All depend only on earlier sprints |
-| Sprint 4 | US-16, US-17, US-13, US-14 | All depend only on earlier sprints |
-| Sprint 5 | US-15, US-18 | All depend only on earlier sprints |
-
-**Dependency note:** with 5 independent base stories (US-01, 03, 05, 07, 08) and 4 slots per sprint, at least one dependency pair cannot be fully separated. The only unavoidable overlap here is US-08 → US-09 in Sprint 2; every other dependency pair (e.g. US-03 → US-04, US-01 → US-02) is split across separate sprints.
-
----
-
 ## Sprint 1
 
 ### US-01 — User Login
