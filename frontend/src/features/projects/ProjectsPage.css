@@ -1,0 +1,79 @@
+.projects-page {
+  text-align: left;
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.project-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.project-form-field label {
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.project-form-field input,
+.project-form-field textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.project-form-error {
+  color: #d1242f;
+}
+
+.project-form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.project-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.project-list-item h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-h);
+}
+
+.project-list-item p {
+  margin: 4px 0 0;
+}
+
+.project-list-empty {
+  color: var(--text);
+}
