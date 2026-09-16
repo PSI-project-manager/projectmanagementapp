@@ -49,3 +49,7 @@ docker compose -f compose.dev.yaml up --build -V --renew-anon-volumes
 
 - Outline clean architecture rules in docs (Azuolas)
 - Add .editorconfig for linter settings (Azuolas)
+
+### Seeded account (local dev DB only):
+- Email: admin@test.local
+- Password: TestAdmin123!
