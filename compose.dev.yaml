@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile
     environment:
       Db__ConnString: "Host=db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB}"
+      Jwt__SigningKey: "${JWT_SIGNING_KEY}"
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: "http://+:8080"
     ports:
@@ -39,7 +40,7 @@ services:
       - "5432:5432"
     volumes:
       - projectmanagementapp_pgdata:/var/lib/postgresql/
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,z
     healthcheck:
           test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
           interval: 5s

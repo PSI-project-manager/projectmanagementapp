@@ -12,21 +12,9 @@ public partial class User
 
     public bool Isactive { get; set; }
 
-    public DateTime Createdat { get; set; }
-
-    public DateTime? Updatedat { get; set; }
-
     public virtual ICollection<Item> ItemAssignedtousers { get; set; } = new List<Item>();
 
-    public virtual ICollection<Item> ItemCreatedbyusers { get; set; } = new List<Item>();
-
-    public virtual ICollection<Itemhistory> Itemhistories { get; set; } = new List<Itemhistory>();
-
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
-
-    public virtual ICollection<Projectuser> Projectusers { get; set; } = new List<Projectuser>();
-
-    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
 
     public virtual ICollection<Userrole> Userroles { get; set; } = new List<Userrole>();
 }

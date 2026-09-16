@@ -1,9 +1,11 @@
 using Api.Data;
 using Api.Dtos;
+using Api.Models;
 using Api.Services;
 using Api.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -21,6 +23,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateProjectRequest>, UpdateProjectRequestValidator>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+builder.Services.AddSingleton<PasswordHasher<User>>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
@@ -41,6 +46,7 @@ app.UseExceptionHandler(errorApp =>
         {
             ValidationException => (StatusCodes.Status400BadRequest, "Validation failed"),
             KeyNotFoundException => (StatusCodes.Status404NotFound, "Not found"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred"),
         };
 

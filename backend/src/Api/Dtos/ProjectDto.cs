@@ -7,8 +7,6 @@ public sealed record ProjectDto(
     string Name,
     string? Description,
     bool IsActive,
-    DateTime CreatedAt,
-    DateTime? UpdatedAt,
     int CreatedByUserId
 )
 {
@@ -18,8 +16,6 @@ public sealed record ProjectDto(
             project.Name,
             project.Description,
             project.Isactive,
-            project.Createdat,
-            project.Updatedat,
             project.Createdbyuserid
         );
 }

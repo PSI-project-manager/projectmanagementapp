@@ -10,17 +10,11 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Item> Items { get; set; }
 
-    public virtual DbSet<Itemhistory> Itemhistories { get; set; }
-
     public virtual DbSet<Itemtype> Itemtypes { get; set; }
 
     public virtual DbSet<Project> Projects { get; set; }
 
-    public virtual DbSet<Projectuser> Projectusers { get; set; }
-
     public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<Session> Sessions { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
 
@@ -46,30 +40,17 @@ public class AppDbContext : DbContext
 
             entity.Property(e => e.Itemid).UseIdentityAlwaysColumn().HasColumnName("itemid");
             entity.Property(e => e.Assignedtouserid).HasColumnName("assignedtouserid");
-            entity
-                .Property(e => e.Createdat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("createdat");
-            entity.Property(e => e.Createdbyuserid).HasColumnName("createdbyuserid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Itemtypeid).HasColumnName("itemtypeid");
             entity.Property(e => e.Projectid).HasColumnName("projectid");
             entity.Property(e => e.Statusid).HasColumnName("statusid");
             entity.Property(e => e.Title).HasMaxLength(200).HasColumnName("title");
-            entity.Property(e => e.Updatedat).HasColumnName("updatedat");
 
             entity
                 .HasOne(d => d.Assignedtouser)
                 .WithMany(p => p.ItemAssignedtousers)
                 .HasForeignKey(d => d.Assignedtouserid)
                 .HasConstraintName("items_assignedtouserid_fkey");
-
-            entity
-                .HasOne(d => d.Createdbyuser)
-                .WithMany(p => p.ItemCreatedbyusers)
-                .HasForeignKey(d => d.Createdbyuserid)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("items_createdbyuserid_fkey");
 
             entity
                 .HasOne(d => d.Itemtype)
@@ -91,40 +72,6 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.Statusid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("items_statusid_fkey");
-        });
-
-        modelBuilder.Entity<Itemhistory>(entity =>
-        {
-            entity.HasKey(e => e.Itemhistoryid).HasName("itemhistory_pkey");
-
-            entity.ToTable("itemhistory");
-
-            entity
-                .Property(e => e.Itemhistoryid)
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("itemhistoryid");
-            entity
-                .Property(e => e.Changedat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("changedat");
-            entity.Property(e => e.Changedbyuserid).HasColumnName("changedbyuserid");
-            entity.Property(e => e.Fieldchanged).HasMaxLength(50).HasColumnName("fieldchanged");
-            entity.Property(e => e.Itemid).HasColumnName("itemid");
-            entity.Property(e => e.Newvalue).HasColumnName("newvalue");
-            entity.Property(e => e.Oldvalue).HasColumnName("oldvalue");
-
-            entity
-                .HasOne(d => d.Changedbyuser)
-                .WithMany(p => p.Itemhistories)
-                .HasForeignKey(d => d.Changedbyuserid)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("itemhistory_changedbyuserid_fkey");
-
-            entity
-                .HasOne(d => d.Item)
-                .WithMany(p => p.Itemhistories)
-                .HasForeignKey(d => d.Itemid)
-                .HasConstraintName("itemhistory_itemid_fkey");
         });
 
         modelBuilder.Entity<Itemtype>(entity =>
@@ -150,10 +97,6 @@ public class AppDbContext : DbContext
             entity.ToTable("projects");
 
             entity.Property(e => e.Projectid).UseIdentityAlwaysColumn().HasColumnName("projectid");
-            entity
-                .Property(e => e.Createdat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("createdat");
             entity.Property(e => e.Createdbyuserid).HasColumnName("createdbyuserid");
             entity
                 .Property(e => e.Description)
@@ -164,7 +107,6 @@ public class AppDbContext : DbContext
                 .Property(e => e.Name)
                 .HasMaxLength(Project.MaxNameLength)
                 .HasColumnName("name");
-            entity.Property(e => e.Updatedat).HasColumnName("updatedat");
 
             entity
                 .HasOne(d => d.Createdbyuser)
@@ -172,32 +114,6 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.Createdbyuserid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("projects_createdbyuserid_fkey");
-        });
-
-        modelBuilder.Entity<Projectuser>(entity =>
-        {
-            entity.HasKey(e => new { e.Projectid, e.Userid }).HasName("projectusers_pkey");
-
-            entity.ToTable("projectusers");
-
-            entity.Property(e => e.Projectid).HasColumnName("projectid");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-            entity
-                .Property(e => e.Grantedat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("grantedat");
-
-            entity
-                .HasOne(d => d.Project)
-                .WithMany(p => p.Projectusers)
-                .HasForeignKey(d => d.Projectid)
-                .HasConstraintName("projectusers_projectid_fkey");
-
-            entity
-                .HasOne(d => d.User)
-                .WithMany(p => p.Projectusers)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("projectusers_userid_fkey");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -211,34 +127,6 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Roleid).UseIdentityAlwaysColumn().HasColumnName("roleid");
             entity.Property(e => e.Description).HasMaxLength(200).HasColumnName("description");
             entity.Property(e => e.Name).HasMaxLength(50).HasColumnName("name");
-        });
-
-        modelBuilder.Entity<Session>(entity =>
-        {
-            entity.HasKey(e => e.Sessionid).HasName("sessions_pkey");
-
-            entity.ToTable("sessions");
-
-            entity.HasIndex(e => e.Token, "sessions_token_key").IsUnique();
-
-            entity
-                .Property(e => e.Sessionid)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("sessionid");
-            entity
-                .Property(e => e.Createdat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("createdat");
-            entity.Property(e => e.Expiresat).HasColumnName("expiresat");
-            entity.Property(e => e.Revokedat).HasColumnName("revokedat");
-            entity.Property(e => e.Token).HasMaxLength(500).HasColumnName("token");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-
-            entity
-                .HasOne(d => d.User)
-                .WithMany(p => p.Sessions)
-                .HasForeignKey(d => d.Userid)
-                .HasConstraintName("sessions_userid_fkey");
         });
 
         modelBuilder.Entity<Status>(entity =>
@@ -264,15 +152,10 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.Email, "users_email_key").IsUnique();
 
             entity.Property(e => e.Userid).UseIdentityAlwaysColumn().HasColumnName("userid");
-            entity
-                .Property(e => e.Createdat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("createdat");
             entity.Property(e => e.Email).HasMaxLength(255).HasColumnName("email");
             entity.Property(e => e.Fullname).HasMaxLength(150).HasColumnName("fullname");
             entity.Property(e => e.Isactive).HasDefaultValue(true).HasColumnName("isactive");
             entity.Property(e => e.Passwordhash).HasMaxLength(255).HasColumnName("passwordhash");
-            entity.Property(e => e.Updatedat).HasColumnName("updatedat");
         });
 
         modelBuilder.Entity<Userrole>(entity =>
@@ -283,10 +166,6 @@ public class AppDbContext : DbContext
 
             entity.Property(e => e.Userid).HasColumnName("userid");
             entity.Property(e => e.Roleid).HasColumnName("roleid");
-            entity
-                .Property(e => e.Assignedat)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("assignedat");
 
             entity
                 .HasOne(d => d.Role)
