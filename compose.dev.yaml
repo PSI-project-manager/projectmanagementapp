@@ -11,15 +11,11 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/App:z
-      - /App/src/Domain/obj
-      - /App/src/Domain/bin
-      - /App/src/Application/obj
-      - /App/src/Application/bin
-      - /App/src/Infrastructure/obj
-      - /App/src/Infrastructure/bin
-      - /App/src/Presentation/obj
-      - /App/src/Presentation/bin
-    depends_on: 
+      - /App/src/Api/obj
+      - /App/src/Api/bin
+      - /App/tests/Api.Tests/obj
+      - /App/tests/Api.Tests/bin
+    depends_on:
       db:
         condition: service_healthy
 
@@ -43,12 +39,12 @@ services:
       - "5432:5432"
     volumes:
       - projectmanagementapp_pgdata:/var/lib/postgresql/
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     healthcheck:
           test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
           interval: 5s
           timeout: 5s
           retries: 5
-    
+
 volumes:
   projectmanagementapp_pgdata:
