@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace Infrastructure.Persistence.Models;
+
+public partial class Projectuser
+{
+    public int Projectid { get; set; }
+
+    public int Userid { get; set; }
+
+    public DateTime Grantedat { get; set; }
+
+    public virtual Project Project { get; set; } = null!;
+
+    public virtual User User { get; set; } = null!;
+}
