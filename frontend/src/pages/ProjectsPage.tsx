@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import type { Project } from '../../types/project'
-import { createProject, listProjects, updateProject } from './mockProjectsApi'
-import { ProjectForm } from './ProjectForm'
-import { ProjectList } from './ProjectList'
+import type { Project } from '../types/project'
+import { createProject, listProjects, updateProject } from '../features/projects/mockProjectsApi'
+import { ProjectForm } from '../features/projects/ProjectForm'
+import { ProjectList } from '../features/projects/ProjectList'
 import './ProjectsPage.css'
 
 /**
@@ -10,7 +10,7 @@ import './ProjectsPage.css'
  * data. Not wired into the app shell yet since navigation/routing spans other stories -
  * swap `mockProjectsApi` for real HTTP calls once the backend endpoints exist.
  */
-export function ProjectsPage() {
+export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [editingProject, setEditingProject] = useState<Project | null>(null)

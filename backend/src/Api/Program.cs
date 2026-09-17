@@ -18,6 +18,15 @@ var connectionString =
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+builder.Services.AddCors(options =>
+    options.AddPolicy("DevelopmentCors", policy =>
+        policy
+            .WithOrigins("http://localhost:5173", "http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+    )
+);
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
@@ -63,6 +72,8 @@ app.UseExceptionHandler(errorApp =>
         );
     })
 );
+
+app.UseCors("DevelopmentCors");
 
 app.MapControllers();
 
