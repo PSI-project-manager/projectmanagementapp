@@ -1,0 +1,46 @@
+.login-page {
+  text-align: left;
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.login-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-form-field label {
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.login-form-field input,
+.login-form-field textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.login-form-error {
+  color: #d1242f;
+}
+
+.login-form-actions {
+  display: flex;
+  gap: 8px;
+}

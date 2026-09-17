@@ -40,7 +40,6 @@ public sealed class ProjectService(
             Name = request.Name.Trim(),
             Description = NormalizeDescription(request.Description),
             Createdbyuserid = request.CreatedByUserId,
-            Createdat = DateTime.UtcNow,
         };
 
         db.Projects.Add(project);
@@ -64,7 +63,6 @@ public sealed class ProjectService(
 
         project.Name = request.Name.Trim();
         project.Description = NormalizeDescription(request.Description);
-        project.Updatedat = DateTime.UtcNow;
 
         await db.SaveChangesAsync(cancellationToken);
 

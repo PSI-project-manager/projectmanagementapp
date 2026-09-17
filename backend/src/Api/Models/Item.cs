@@ -14,19 +14,9 @@ public partial class Item
 
     public int Statusid { get; set; }
 
-    public int Createdbyuserid { get; set; }
-
     public int? Assignedtouserid { get; set; }
 
-    public DateTime Createdat { get; set; }
-
-    public DateTime? Updatedat { get; set; }
-
     public virtual User? Assignedtouser { get; set; }
-
-    public virtual User Createdbyuser { get; set; } = null!;
-
-    public virtual ICollection<Itemhistory> Itemhistories { get; set; } = new List<Itemhistory>();
 
     public virtual Itemtype Itemtype { get; set; } = null!;
 
