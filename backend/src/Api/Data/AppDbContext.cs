@@ -103,10 +103,7 @@ public class AppDbContext : DbContext
                 .HasMaxLength(Project.MaxDescriptionLength)
                 .HasColumnName("description");
             entity.Property(e => e.Isactive).HasDefaultValue(true).HasColumnName("isactive");
-            entity
-                .Property(e => e.Name)
-                .HasMaxLength(Project.MaxNameLength)
-                .HasColumnName("name");
+            entity.Property(e => e.Name).HasMaxLength(Project.MaxNameLength).HasColumnName("name");
 
             entity
                 .HasOne(d => d.Createdbyuser)

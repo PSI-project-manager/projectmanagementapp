@@ -19,11 +19,13 @@ var connectionString =
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 builder.Services.AddCors(options =>
-    options.AddPolicy("DevelopmentCors", policy =>
-        policy
-            .WithOrigins("http://localhost:5173", "http://localhost:3000")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
+    options.AddPolicy(
+        "DevelopmentCors",
+        policy =>
+            policy
+                .WithOrigins("http://localhost:5173", "http://localhost:3000")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
     )
 );
 
@@ -35,6 +37,9 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();
+builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
 
 var app = builder.Build();
 
@@ -65,9 +70,8 @@ app.UseExceptionHandler(errorApp =>
             {
                 Status = status,
                 Title = title,
-                Detail = status == StatusCodes.Status500InternalServerError
-                    ? null
-                    : exception?.Message,
+                Detail =
+                    status == StatusCodes.Status500InternalServerError ? null : exception?.Message,
             }
         );
     })
