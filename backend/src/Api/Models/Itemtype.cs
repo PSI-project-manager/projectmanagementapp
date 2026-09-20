@@ -6,7 +6,9 @@ public partial class Itemtype
 
     public string Name { get; set; } = null!;
 
-    public bool Isactive { get; set; }
+    public bool Isactive { get; set; } = true;
 
     public virtual ICollection<Item> Items { get; set; } = new List<Item>();
+
+    public const int MaxNameLength = 100;
 }
