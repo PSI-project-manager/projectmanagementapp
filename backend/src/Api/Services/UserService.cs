@@ -11,12 +11,12 @@ namespace Api.Services;
 /// User administration (US-08). Restricting these operations to admins isn't wired up yet,
 /// so every endpoint is currently open — see <c>UsersController</c>.
 /// </summary>
-public sealed class UserService(
+public class UserService(
     AppDbContext db,
     IValidator<CreateUserRequest> createValidator,
     IValidator<UpdateUserRequest> updateValidator,
     PasswordHasher<User> passwordHasher
-) : IUserService
+)
 {
     public async Task<IEnumerable<UserDto>> ListAsync(
         bool activeOnly = false,

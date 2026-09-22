@@ -7,7 +7,7 @@ namespace Api.Controllers;
 // TODO (US-08): restrict to admins once role-based authorization is wired up.
 [ApiController]
 [Route("api/users")]
-public sealed class UsersController(IUserService userService) : ControllerBase
+public class UsersController(UserService userService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto>>> List(
@@ -50,4 +50,4 @@ public sealed class UsersController(IUserService userService) : ControllerBase
         Ok(await userService.SetActiveAsync(id, false, ct));
 }
 
-public sealed record UpdateUserRequestBody(string Email, string FullName);
+public record UpdateUserRequestBody(string Email, string FullName);

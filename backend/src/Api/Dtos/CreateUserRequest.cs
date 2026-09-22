@@ -1,3 +1,3 @@
 namespace Api.Dtos;
 
-public sealed record CreateUserRequest(string Email, string FullName, string Password);
+public record CreateUserRequest(string Email, string FullName, string Password);
