@@ -2,6 +2,10 @@ namespace Api.Models;
 
 public partial class User
 {
+    public const int MaxEmailLength = 255;
+    public const int MaxFullNameLength = 150;
+    public const int MinPasswordLength = 8;
+
     public int Userid { get; set; }
 
     public string Email { get; set; } = null!;

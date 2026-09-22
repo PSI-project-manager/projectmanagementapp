@@ -40,6 +40,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();
 builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
+builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
