@@ -33,6 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateProjectRequest>, UpdateProjectRequestValidator>();
+builder.Services.AddScoped<IValidator<ProjectAccessRequest>, ProjectAccessRequestValidator>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();

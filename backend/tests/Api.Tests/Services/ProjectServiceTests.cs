@@ -263,7 +263,10 @@ public class ProjectServiceTests
         await service.GrantAccessAsync(new ProjectAccessRequest(project.Id, contributor.Userid));
 
         var access = await service.ListAccessAsync(project.Id);
-        Assert.Single(access);
+
+        Assert.Equal(2, access.Count);
+        Assert.Contains(access, a => a.UserId == owner.Userid);
+        Assert.Contains(access, a => a.UserId == contributor.Userid);
     }
 
     [Fact]

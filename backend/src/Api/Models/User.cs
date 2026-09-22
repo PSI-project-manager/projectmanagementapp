@@ -17,4 +17,7 @@ public partial class User
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 
     public virtual ICollection<Userrole> Userroles { get; set; } = new List<Userrole>();
+
+    /// <summary>Projects this user has been explicitly granted access to (US-06).</summary>
+    public virtual ICollection<Projectuser> Projectusers { get; set; } = new List<Projectuser>();
 }
