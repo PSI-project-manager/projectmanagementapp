@@ -29,6 +29,16 @@ CREATE TABLE Projects (
     FOREIGN KEY (CreatedByUserId) REFERENCES Users(UserId)
 );
 
+CREATE TABLE ProjectUsers (
+    ProjectId       INT NOT NULL,
+    UserId          INT NOT NULL,
+    PRIMARY KEY (ProjectId, UserId),
+    FOREIGN KEY (ProjectId) REFERENCES Projects(ProjectId) ON DELETE CASCADE,
+    FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
+);
+
+CREATE INDEX IX_ProjectUsers_UserId ON ProjectUsers(UserId);
+
 CREATE TABLE ItemTypes (
     ItemTypeId      INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     Name            VARCHAR(100) NOT NULL UNIQUE,
