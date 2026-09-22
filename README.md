@@ -45,11 +45,7 @@ If you added a new dotnet dependency in some backend layer, you have to rebuild 
 docker compose -f compose.dev.yaml up --build -V --renew-anon-volumes
 ```
 
-# TODO
-
-- Outline clean architecture rules in docs (Azuolas)
-- Add .editorconfig for linter settings (Azuolas)
-
 ### Seeded account (local dev DB only):
+
 - Email: admin@test.local
 - Password: TestAdmin123!
