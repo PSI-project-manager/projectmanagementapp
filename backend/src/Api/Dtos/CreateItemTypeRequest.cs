@@ -1,3 +1,3 @@
 namespace Api.Dtos;
 
-public sealed record CreateItemTypeRequest(string Name);
+public record CreateItemTypeRequest(string Name);

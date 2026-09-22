@@ -14,8 +14,6 @@ services:
       - ./backend:/App:z
       - /App/src/Api/obj
       - /App/src/Api/bin
-      - /App/tests/Api.Tests/obj
-      - /App/tests/Api.Tests/bin
     depends_on:
       db:
         condition: service_healthy

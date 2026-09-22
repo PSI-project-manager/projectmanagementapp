@@ -1,3 +1,3 @@
 namespace Api.Dtos;
 
-public sealed record UpdateProjectRequest(int ProjectId, string Name, string? Description);
+public record UpdateProjectRequest(string Name, string? Description);
