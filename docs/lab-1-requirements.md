@@ -23,12 +23,12 @@ Formal Requirements:​
 
 - [ ] Using a stream to load data (can be from file, web service, socket etc.).​
 
-- [ ] LINQ to Objects used where appropriate (methods or queries). If LINQ is not used in a particular scenario, provide a justification.​
+- [x] LINQ to Objects used where appropriate (methods or queries). If LINQ is not used in a particular scenario, provide a justification.​
 
 - [ ] Implement at least one of the standard .NET interfaces (IEnumerable, IComparable, IComparer, IEquatable, IEnumerator, etc.)​
 
 - [ ] All changes reviewed via pull requests; each PR must have description explaining what was done and why. Each team member must have authored at least 3  merged PRs and reviewed at least 3 PRs from teammates. PR is counted as reviewed only if there are any meaningful comments and discussions.​
-
+ 
 - [ ] Uniform coding style is used throughout the project.​
 
-- [ ] Define 10+ user stories and acceptance criteria for the product. Have at least 3 of them implemented​
+- [x] Define 10+ user stories and acceptance criteria for the product. Have at least 3 of them implemented​
