@@ -38,6 +38,7 @@ builder.Services.AddOpenApi();
 // projects
 builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateProjectRequest>, UpdateProjectRequestValidator>();
+builder.Services.AddScoped<IValidator<ProjectAccessRequest>, ProjectAccessRequestValidator>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // login

@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Project> Projects { get; set; }
 
+    public virtual DbSet<Projectuser> Projectusers { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Status> Statuses { get; set; }
@@ -111,6 +113,32 @@ public class AppDbContext : DbContext
                 .HasForeignKey(d => d.Createdbyuserid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("projects_createdbyuserid_fkey");
+        });
+
+        modelBuilder.Entity<Projectuser>(entity =>
+        {
+            entity.HasKey(e => new { e.Projectid, e.Userid }).HasName("projectusers_pkey");
+
+            entity.ToTable("projectusers");
+
+            entity.HasIndex(e => e.Userid, "ix_projectusers_userid");
+
+            entity.Property(e => e.Projectid).HasColumnName("projectid");
+            entity.Property(e => e.Userid).HasColumnName("userid");
+
+            entity
+                .HasOne(d => d.Project)
+                .WithMany(p => p.Projectusers)
+                .HasForeignKey(d => d.Projectid)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("projectusers_projectid_fkey");
+
+            entity
+                .HasOne(d => d.User)
+                .WithMany(p => p.Projectusers)
+                .HasForeignKey(d => d.Userid)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("projectusers_userid_fkey");
         });
 
         modelBuilder.Entity<Role>(entity =>

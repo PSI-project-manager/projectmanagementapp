@@ -18,4 +18,6 @@ public partial class Project
     public virtual User Createdbyuser { get; set; } = null!;
 
     public virtual ICollection<Item> Items { get; set; } = new List<Item>();
+
+    public virtual ICollection<Projectuser> Projectusers { get; set; } = new List<Projectuser>();
 }
