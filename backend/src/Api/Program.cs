@@ -13,12 +13,7 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // database connection
-var connectionString = builder.Configuration["Db:ConnString"];
-if (connectionString == null)
-{
-    throw new InvalidOperationException("Db:ConnString is not configured.");
-}
-
+string connectionString = builder.Configuration["Db:ConnString"]!;
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 // allow frontend to call the api
@@ -38,17 +33,19 @@ builder.Services.AddOpenApi();
 // projects
 builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateProjectRequest>, UpdateProjectRequestValidator>();
-builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ProjectService>();
 
 // login
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<AuthService>();
 
 // item types
 builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();
-builder.Services.AddScoped<IItemTypeService, ItemTypeService>();
+builder.Services.AddScoped<ItemTypeService>();
+
+// users
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddScoped<UserService>();
@@ -61,10 +58,8 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 
     // make the admin account
-    await DevDataSeeder.SeedAsync(app.Services);
+    DevDataSeeder.Seed(app.Services);
 }
-
-// app.UseHttpsRedirection();
 
 // turn exceptions into error responses
 app.UseExceptionHandler(errorApp =>

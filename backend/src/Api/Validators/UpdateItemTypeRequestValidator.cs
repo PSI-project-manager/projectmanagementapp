@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Api.Validators;
 
-public sealed class UpdateItemTypeRequestValidator : AbstractValidator<UpdateItemTypeRequest>
+public class UpdateItemTypeRequestValidator : AbstractValidator<UpdateItemTypeRequest>
 {
     public UpdateItemTypeRequestValidator()
     {

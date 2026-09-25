@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-public sealed class ItemTypeService(
+public class ItemTypeService(
     AppDbContext db,
     IValidator<CreateItemTypeRequest> createValidator,
     IValidator<UpdateItemTypeRequest> updateValidator
-) : IItemTypeService
+)
 {
     public async Task<IEnumerable<ItemTypeDto>> ListAsync(
         bool activeOnly = false,

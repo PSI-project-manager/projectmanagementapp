@@ -10,11 +10,11 @@ namespace Api.Services;
 /// Project-level access scoping for contributors (US-06) doesn't exist yet, so
 /// <see cref="ListAsync"/> intentionally returns every project until that access model lands.
 /// </summary>
-public sealed class ProjectService(
+public class ProjectService(
     AppDbContext db,
     IValidator<CreateProjectRequest> createValidator,
     IValidator<UpdateProjectRequest> updateValidator
-) : IProjectService
+)
 {
     public async Task<IReadOnlyList<ProjectDto>> ListAsync(
         CancellationToken cancellationToken = default

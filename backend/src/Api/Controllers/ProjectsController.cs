@@ -6,7 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/projects")]
-public sealed class ProjectsController(IProjectService projectService) : ControllerBase
+public class ProjectsController(ProjectService projectService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProjectDto>>> List(
@@ -38,4 +38,4 @@ public sealed class ProjectsController(IProjectService projectService) : Control
     }
 }
 
-public sealed record UpdateProjectRequestBody(string Name, string? Description);
+public record UpdateProjectRequestBody(string Name, string? Description);

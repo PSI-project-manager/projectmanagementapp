@@ -11,12 +11,12 @@ using System.Text;
 
 namespace Api.Services;
 
-public sealed class AuthService(
+public class AuthService(
     AppDbContext db,
     IValidator<LoginRequest> validator,
     PasswordHasher<User> passwordHasher,
     IConfiguration configuration
-) : IAuthService
+)
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
 

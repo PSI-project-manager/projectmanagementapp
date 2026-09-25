@@ -2,7 +2,7 @@ using Api.Models;
 
 namespace Api.Dtos;
 
-public sealed record ProjectDto(
+public record ProjectDto(
     int Id,
     string Name,
     string? Description,

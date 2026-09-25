@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Api.Validators;
 
-public sealed class CreateItemTypeRequestValidator : AbstractValidator<CreateItemTypeRequest>
+public class CreateItemTypeRequestValidator : AbstractValidator<CreateItemTypeRequest>
 {
     public CreateItemTypeRequestValidator()
     {

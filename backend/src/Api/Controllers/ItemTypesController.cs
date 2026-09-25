@@ -6,7 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/item-types")]
-public sealed class ItemTypesController(IItemTypeService itemTypeService) : ControllerBase
+public class ItemTypesController(ItemTypeService itemTypeService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ItemTypeDto>>> List(
@@ -42,4 +42,4 @@ public sealed class ItemTypesController(IItemTypeService itemTypeService) : Cont
 }
 
 
-public sealed record UpdateItemTypeRequestBody(string Name, bool IsActive);
+public record UpdateItemTypeRequestBody(string Name, bool IsActive);

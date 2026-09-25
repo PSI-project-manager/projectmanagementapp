@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Api.Validators;
 
-public sealed class UpdateProjectRequestValidator : AbstractValidator<UpdateProjectRequest>
+public class UpdateProjectRequestValidator : AbstractValidator<UpdateProjectRequest>
 {
     public UpdateProjectRequestValidator()
     {
