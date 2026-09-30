@@ -8,17 +8,19 @@ import ItemTypesPage from './pages/ItemTypesPage.tsx'
 import UsersPage from './pages/UsersPage.tsx'
 
 import './index.css'
-import App from './App.tsx'
+import ProtectedRoute from './features/protectedRoutes/ProtectedRoute.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/admin/item-types" element={<ItemTypesPage />} />
-        <Route path="/admin/users" element={<UsersPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/admin/item-types" element={<ItemTypesPage />} />
+          <Route path="/admin/users" element={<UsersPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   </StrictMode>
