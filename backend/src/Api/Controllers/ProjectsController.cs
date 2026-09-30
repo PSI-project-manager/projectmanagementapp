@@ -1,11 +1,13 @@
 using Api.Dtos;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/projects")]
+[Authorize]
 public class ProjectsController(ProjectService projectService) : ControllerBase
 {
     [HttpGet]
