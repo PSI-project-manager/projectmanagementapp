@@ -59,6 +59,10 @@ builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
 builder.Services.AddScoped<AuthService>();
 
+// items
+builder.Services.AddScoped<IValidator<CreateItemRequest>, CreateItemRequestValidator>();
+builder.Services.AddScoped<ItemService>();
+
 // item types
 builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();
