@@ -1,6 +1,5 @@
 namespace Api.Models;
 
-
 public partial class Projectuser
 {
     public int Projectid { get; set; }

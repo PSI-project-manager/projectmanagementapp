@@ -4,13 +4,13 @@ using Api.Models;
 using Api.Services;
 using Api.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,22 +21,27 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 // allow frontend to call the api
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DevelopmentCors", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000");
-        policy.AllowAnyMethod();
-        policy.AllowAnyHeader();
-    });
+    options.AddPolicy(
+        "DevelopmentCors",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173", "http://localhost:3000");
+            policy.AllowAnyMethod();
+            policy.AllowAnyHeader();
+        }
+    );
 });
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // authentication before api
-var signingKey = builder.Configuration["Jwt:SigningKey"]
+var signingKey =
+    builder.Configuration["Jwt:SigningKey"]
     ?? throw new InvalidOperationException("Jwt:SigningKey is not configured.");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -44,7 +49,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = true,
-            IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(signingKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(signingKey)
+            ),
         };
     });
 builder.Services.AddAuthorization();
