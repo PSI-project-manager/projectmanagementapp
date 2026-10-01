@@ -1,28 +1,34 @@
 import { useEffect, useState } from 'react'
 import type { Project } from '../types/project'
-import { createProject, listProjects, updateProject } from '../features/projects/mockProjectsApi'
+import { createProject, listProjects, updateProject } from '../features/projects/projectsApi'
 import { ProjectForm } from '../features/projects/ProjectForm'
 import { ProjectList } from '../features/projects/ProjectList'
 import './ProjectsPage.css'
 
 /**
- * Self-contained projects screen (list + create/edit form) backed by mock in-memory
- * data. Not wired into the app shell yet since navigation/routing spans other stories -
- * swap `mockProjectsApi` for real HTTP calls once the backend endpoints exist.
+ * Projects screen (list + create/edit form). The list only contains the projects the
+ * current user is authorized for - that scoping is enforced by the backend.
  */
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    listProjects().then((data) => {
-      if (!cancelled) {
-        setProjects(data)
-        setLoading(false)
-      }
-    })
+    listProjects()
+      .then((data) => {
+        if (!cancelled) setProjects(data)
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setLoadError(err instanceof Error ? err.message : 'Failed to load projects.')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
     return () => {
       cancelled = true
     }
@@ -42,6 +48,10 @@ export default function ProjectsPage() {
 
   if (loading) {
     return <p>Loading projects...</p>
+  }
+
+  if (loadError) {
+    return <p role="alert">{loadError}</p>
   }
 
   return (
