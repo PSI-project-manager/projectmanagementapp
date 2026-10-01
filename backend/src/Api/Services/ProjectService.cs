@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-
 public class ProjectService(
     AppDbContext db,
     IValidator<CreateProjectRequest> createValidator,

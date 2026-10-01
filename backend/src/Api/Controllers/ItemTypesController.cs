@@ -1,7 +1,7 @@
 using Api.Dtos;
 using Api.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
@@ -42,6 +42,5 @@ public class ItemTypesController(ItemTypeService itemTypeService) : ControllerBa
         return Ok(updated);
     }
 }
-
 
 public record UpdateItemTypeRequestBody(string Name, bool IsActive);

@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Api.Dtos;
 using Api.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
