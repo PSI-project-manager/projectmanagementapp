@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Api.Dtos;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +11,20 @@ namespace Api.Controllers;
 [Authorize]
 public class ProjectsController(ProjectService projectService) : ControllerBase
 {
+    // AuthService puts the user id in the "sub" claim; depending on claim mapping it can
+    // show up as either "sub" or NameIdentifier
+    private int CurrentUserId =>
+        int.TryParse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"),
+            out var id
+        )
+            ? id
+            : throw new UnauthorizedAccessException("Token has no valid user id.");
+
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProjectDto>>> List(
         CancellationToken cancellationToken
-    ) => Ok(await projectService.ListAsync(cancellationToken));
+    ) => Ok(await projectService.ListAsync(CurrentUserId, cancellationToken));
 
     [HttpPost]
     public async Task<ActionResult<ProjectDto>> Create(
@@ -34,6 +45,7 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
     {
         var project = await projectService.UpdateAsync(
             new UpdateProjectRequest(id, body.Name, body.Description),
+            CurrentUserId,
             cancellationToken
         );
         return Ok(project);

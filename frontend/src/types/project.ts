@@ -1,10 +1,9 @@
 export interface Project {
-  id: string
-  organizationId: string
+  id: number
   name: string
-  description?: string
-  createdAt: string
-  updatedAt: string
+  description?: string | null
+  isActive: boolean
+  createdByUserId: number
 }
 
 export interface CreateProjectInput {

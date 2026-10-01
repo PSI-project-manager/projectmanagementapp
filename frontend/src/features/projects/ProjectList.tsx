@@ -7,7 +7,7 @@ interface ProjectListProps {
 
 export function ProjectList({ projects, onEdit }: ProjectListProps) {
   if (projects.length === 0) {
-    return <p className="project-list-empty">No projects yet. Create one to get started.</p>
+    return <p className="project-list-empty">No projects to show. Projects you have access to will appear here.</p>
   }
 
   return (
