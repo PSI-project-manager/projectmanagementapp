@@ -21,12 +21,15 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
             ? id
             : throw new UnauthorizedAccessException("Token has no valid user id.");
 
+    
     [HttpGet]
+    [Authorize(Roles="Admin, Contributor")]
     public async Task<ActionResult<IReadOnlyList<ProjectDto>>> List(
         CancellationToken cancellationToken
     ) => Ok(await projectService.ListAsync(CurrentUserId, cancellationToken));
 
     [HttpPost]
+    [Authorize(Roles="Admin")]
     public async Task<ActionResult<ProjectDto>> Create(
         CreateProjectRequest request,
         CancellationToken cancellationToken
@@ -37,6 +40,7 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles="Admin")]
     public async Task<ActionResult<ProjectDto>> Update(
         int id,
         UpdateProjectRequestBody body,

@@ -1,4 +1,5 @@
 import type { CreateItemInput, Item, ProjectOption } from '../../types/item'
+import { parse } from '../../services/apiClient'
 
 function headers(): HeadersInit {
   const token = localStorage.getItem('token')
@@ -6,15 +7,6 @@ function headers(): HeadersInit {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
-}
-
-async function parse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    // Backend errors are ProblemDetails: { status, title, detail }
-    const problem = await response.json().catch(() => null)
-    throw new Error(problem?.detail || problem?.title || 'Request failed.')
-  }
-  return response.json()
 }
 
 export async function createItem(input: CreateItemInput): Promise<Item> {

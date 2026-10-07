@@ -7,6 +7,7 @@ import ProjectsPage from './pages/ProjectsPage.tsx'
 import ItemTypesPage from './pages/ItemTypesPage.tsx'
 import UsersPage from './pages/UsersPage.tsx'
 import ItemsPage from './pages/ItemsPage.tsx'
+import PermissionDeniedPage from './pages/PermissionDeniedPage.tsx'
 
 
 import './index.css'
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/admin/item-types" element={<ItemTypesPage />} />
           <Route path="/admin/users" element={<UsersPage />} />
           <Route path="/items/new" element={<ItemsPage />} />
+          <Route path="/forbidden" element={<PermissionDeniedPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

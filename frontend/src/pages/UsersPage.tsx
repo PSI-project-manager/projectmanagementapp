@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { isForbidden } from '../services/apiClient'
+import PermissionDeniedPage from './PermissionDeniedPage'
 import type { User } from '../types/user'
 import {
   createUser,
@@ -14,6 +16,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [forbidden, setForbidden] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
@@ -25,7 +28,12 @@ export default function UsersPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setLoadError(err instanceof Error ? err.message : 'Failed to load users.')
+          // a 403 means the account lacks the role, not that the request was bad
+          if (isForbidden(err)) {
+            setForbidden(true)
+          } else {
+            setLoadError(err instanceof Error ? err.message : 'Failed to load users.')
+          }
         }
       })
       .finally(() => {
@@ -64,6 +72,10 @@ export default function UsersPage() {
 
   if (loading) {
     return <p>Loading users...</p>
+  }
+
+  if (forbidden) {
+    return <PermissionDeniedPage />
   }
 
   return (

@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-// TODO (US-08): restrict to admins once role-based authorization is wired up.
 [ApiController]
 [Route("api/users")]
-[Authorize]
+[Authorize(Roles="Admin")]
 public class UsersController(UserService userService) : ControllerBase
 {
     [HttpGet]
