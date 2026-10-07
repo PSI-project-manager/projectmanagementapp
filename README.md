@@ -45,7 +45,19 @@ If you added a new dotnet dependency in some backend layer, you have to rebuild 
 docker compose -f compose.dev.yaml up --build -V --renew-anon-volumes
 ```
 
-### Seeded account (local dev DB only):
+### Seeded accounts (local dev DB only):
+
+Admin:
 
 - Email: admin@test.local
 - Password: TestAdmin123!
+
+Contributor:
+
+- Email: contributor@test.local
+- Password: Test1234!
+
+Admin + Contributor:
+
+- Email: admincontributor@test.local
+- Password: Test1234!
