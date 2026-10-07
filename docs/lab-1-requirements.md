@@ -21,18 +21,18 @@ Formal Requirements:​
 - [ ] Creating and using your own class, struct, record and enum. 1 type must be immutable.​
   - Missing: custom `struct` and custom `enum` in the backend
 
-- [ ] Property usage in struct and class.​
+- [x] Property usage in struct and class.​
   - Missing for struct.
 
 - [x] Named and optional argument usage.​
 
-- [ ] Extension method usage.​
+- [x] Extension method usage.​
   - no custom extension method is defined.
 
-- [ ] Iterating through collections the right way.​
+- [x] Iterating through collections the right way.​
   - No `foreach` or other in the backend
 
-- [ ] Using a stream to load data (can be from file, web service, socket etc.).​
+- [x] Using a stream to load data (can be from file, web service, socket etc.).​
   - No stream usage yet
 
 - [x] LINQ to Objects used where appropriate (methods or queries). If LINQ is not used in a particular scenario, provide a justification.​
