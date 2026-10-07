@@ -1,0 +1,37 @@
+name: Format check
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+
+jobs:
+  csharpier:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      # Reports unformatted files as a warning but never fails the job, so it can't block merging.
+      - name: Check formatting
+        continue-on-error: true
+        run: |
+          if ! dotnet csharpier check .; then
+            echo "::warning title=CSharpier::Some C# files are not formatted. Run 'dotnet csharpier format .' from backend/."
+            exit 1
+          fi

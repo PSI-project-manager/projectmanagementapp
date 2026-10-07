@@ -12,7 +12,7 @@ export default function LoginPage() {
         try {
             await login({ email, password })
             console.log('Login successful')
-            window.location.href = '/projects' // Redirect to the projects page after successful login
+            window.location.href = '/' // Redirect to the home page after successful login
         } catch {
             // Error is handled by the hook and displayed below
         }
