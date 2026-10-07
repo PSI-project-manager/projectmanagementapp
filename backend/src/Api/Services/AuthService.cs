@@ -38,7 +38,7 @@ public class AuthService(
             cancellationToken
         );
 
-        if (user is null || !user.Isactive)
+        if (user is null)
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
@@ -52,6 +52,11 @@ public class AuthService(
         if (verification == PasswordVerificationResult.Failed)
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
+        }
+        
+        if(!user.Isactive)
+        {
+            throw new UnauthorizedAccessException("User is not activated.");
         }
 
         if (verification == PasswordVerificationResult.SuccessRehashNeeded)
