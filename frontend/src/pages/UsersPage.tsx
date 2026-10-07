@@ -53,9 +53,17 @@ export default function UsersPage() {
     await reload()
   }
 
-  const handleUpdate = async (values: { email: string; fullName: string }) => {
+  const handleUpdate = async (values: {
+    email: string
+    fullName: string
+    roles: string[]
+  }) => {
     if (!editingUser) return
-    await updateUser(editingUser.id, { email: values.email, fullName: values.fullName })
+    await updateUser(editingUser.id, {
+      email: values.email,
+      fullName: values.fullName,
+      roles: values.roles,
+    })
     await reload()
     setEditingUser(null)
   }

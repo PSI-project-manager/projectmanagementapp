@@ -37,7 +37,7 @@ public class UsersController(UserService userService) : ControllerBase
         CancellationToken ct = default
     )
     {
-        var request = new UpdateUserRequest(id, body.Email, body.FullName);
+        var request = new UpdateUserRequest(id, body.Email, body.FullName, body.Roles);
         var updated = await userService.UpdateAsync(request, ct);
         return Ok(updated);
     }
@@ -51,4 +51,4 @@ public class UsersController(UserService userService) : ControllerBase
         Ok(await userService.SetActiveAsync(id, false, ct));
 }
 
-public record UpdateUserRequestBody(string Email, string FullName);
+public record UpdateUserRequestBody(string Email, string FullName, ICollection<string> Roles);
