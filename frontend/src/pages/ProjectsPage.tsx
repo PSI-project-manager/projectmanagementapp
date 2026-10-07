@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { isForbidden } from '../services/apiClient'
+import PermissionDeniedPage from './PermissionDeniedPage'
 import type { Project } from '../types/project'
 import { createProject, listProjects, updateProject } from '../features/projects/projectsApi'
 import { ProjectForm } from '../features/projects/ProjectForm'
@@ -13,6 +15,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [forbidden, setForbidden] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
 
   useEffect(() => {
@@ -23,7 +26,12 @@ export default function ProjectsPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setLoadError(err instanceof Error ? err.message : 'Failed to load projects.')
+          // a 403 means the account lacks the role, not that the request was bad
+          if (isForbidden(err)) {
+            setForbidden(true)
+          } else {
+            setLoadError(err instanceof Error ? err.message : 'Failed to load projects.')
+          }
         }
       })
       .finally(() => {
@@ -48,6 +56,10 @@ export default function ProjectsPage() {
 
   if (loading) {
     return <p>Loading projects...</p>
+  }
+
+  if (forbidden) {
+    return <PermissionDeniedPage />
   }
 
   if (loadError) {

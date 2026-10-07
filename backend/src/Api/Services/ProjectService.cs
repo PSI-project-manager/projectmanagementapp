@@ -12,16 +12,15 @@ public class ProjectService(
     IValidator<UpdateProjectRequest> updateValidator
 )
 {
-    private const string AdminRoleName = "Admin";
-
     public async Task<IReadOnlyList<ProjectDto>> ListAsync(
         int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken cancellationToken = default
     )
     {
         var query = db.Projects.AsNoTracking();
 
-        if (!await IsAdminAsync(currentUserId, cancellationToken))
+        if (!currentUserIsAdmin)
         {
             query = query.Where(p => p.Projectusers.Any(pu => pu.Userid == currentUserId));
         }
@@ -57,6 +56,7 @@ public class ProjectService(
     public async Task<ProjectDto> UpdateAsync(
         UpdateProjectRequest request,
         int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken cancellationToken = default
     )
     {
@@ -69,7 +69,14 @@ public class ProjectService(
             ) ?? throw new KeyNotFoundException($"Project '{request.ProjectId}' was not found.");
 
         // same response as a missing project so we don't leak which ids exist
-        if (!await CanAccessAsync(project.Projectid, currentUserId, cancellationToken))
+        if (
+            !await CanAccessAsync(
+                project.Projectid,
+                currentUserId,
+                currentUserIsAdmin,
+                cancellationToken
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{request.ProjectId}' was not found.");
         }
@@ -82,21 +89,16 @@ public class ProjectService(
         return ProjectDto.FromEntity(project);
     }
 
+    // admins reach every project; everyone else only the ones they are a member of
     private async Task<bool> CanAccessAsync(
         int projectId,
         int userId,
+        bool isAdmin,
         CancellationToken cancellationToken
     ) =>
-        await IsAdminAsync(userId, cancellationToken)
+        isAdmin
         || await db.Projectusers.AnyAsync(
             pu => pu.Projectid == projectId && pu.Userid == userId,
-            cancellationToken
-        );
-
-    // checked against the db (not the token) so role changes apply immediately
-    private Task<bool> IsAdminAsync(int userId, CancellationToken cancellationToken) =>
-        db.Userroles.AnyAsync(
-            ur => ur.Userid == userId && ur.Role.Name == AdminRoleName,
             cancellationToken
         );
 

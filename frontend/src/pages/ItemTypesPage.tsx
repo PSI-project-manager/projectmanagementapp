@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { isForbidden } from '../services/apiClient'
+import PermissionDeniedPage from './PermissionDeniedPage'
 import type { ItemType } from '../types/itemType'
 import {
   createItemType,
@@ -13,6 +15,7 @@ export default function ItemTypesPage() {
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [forbidden, setForbidden] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [editingItemType, setEditingItemType] = useState<ItemType | null>(null)
 
@@ -24,7 +27,12 @@ export default function ItemTypesPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setLoadError(err instanceof Error ? err.message : 'Failed to load item types.')
+          // a 403 means the account lacks the role, not that the request was bad
+          if (isForbidden(err)) {
+            setForbidden(true)
+          } else {
+            setLoadError(err instanceof Error ? err.message : 'Failed to load item types.')
+          }
         }
       })
       .finally(() => {
@@ -66,6 +74,10 @@ export default function ItemTypesPage() {
 
   if (loading) {
     return <p>Loading item types...</p>
+  }
+
+  if (forbidden) {
+    return <PermissionDeniedPage />
   }
 
   return (

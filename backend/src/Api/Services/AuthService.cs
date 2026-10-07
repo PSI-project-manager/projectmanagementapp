@@ -18,7 +18,7 @@ public class AuthService(
     IConfiguration configuration
 )
 {
-    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(10);
 
     private readonly string signingKey =
         configuration["Jwt:SigningKey"]
@@ -38,7 +38,7 @@ public class AuthService(
             cancellationToken
         );
 
-        if (user is null || !user.Isactive)
+        if (user is null)
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
@@ -53,28 +53,36 @@ public class AuthService(
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
+        
+        if(!user.Isactive)
+        {
+            throw new UnauthorizedAccessException("User is not activated.");
+        }
 
         if (verification == PasswordVerificationResult.SuccessRehashNeeded)
         {
             user.Passwordhash = passwordHasher.HashPassword(user, request.Password);
             await db.SaveChangesAsync(cancellationToken);
         }
+        
+        List<string> userRoles= await db.Userroles.Where(ur => ur.Userid == user.Userid).Select(ur => ur.Role.Name).ToListAsync(cancellationToken);
 
-        return new LoginResponse(GenerateToken(user), user.Userid, user.Email, user.Fullname);
+        return new LoginResponse(GenerateToken(user, userRoles), user.Userid, user.Email, user.Fullname);
     }
 
-    private string GenerateToken(User user)
+    private string GenerateToken(User user, IEnumerable<string> userRoles)
     {
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)),
             SecurityAlgorithms.HmacSha256
         );
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Userid.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
+          new(JwtRegisteredClaimNames.Sub, user.Userid.ToString()),
+          new(JwtRegisteredClaimNames.Email, user.Email),
         };
+        claims.AddRange(userRoles.Select(name => new Claim("role", name)));
 
         var token = new JwtSecurityToken(
             claims: claims,
@@ -84,4 +92,5 @@ public class AuthService(
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
 }

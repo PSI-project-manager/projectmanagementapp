@@ -21,22 +21,31 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
             ? id
             : throw new UnauthorizedAccessException("Token has no valid user id.");
 
+    // read off the token's role claims, same as the [Authorize(Roles=...)] attributes
+    private bool CurrentUserIsAdmin => User.IsInRole("Admin");
+
     [HttpGet]
+    [Authorize(Roles = "Admin, Contributor")]
     public async Task<ActionResult<IReadOnlyList<ProjectDto>>> List(
         CancellationToken cancellationToken
-    ) => Ok(await projectService.ListAsync(CurrentUserId, cancellationToken));
+    ) => Ok(await projectService.ListAsync(CurrentUserId, CurrentUserIsAdmin, cancellationToken));
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProjectDto>> Create(
-        CreateProjectRequest request,
+        CreateProjectRequestBody body,
         CancellationToken cancellationToken
     )
     {
-        var project = await projectService.CreateAsync(request, cancellationToken);
+        var project = await projectService.CreateAsync(
+            new CreateProjectRequest(body.Name, body.Description, CurrentUserId),
+            cancellationToken
+        );
         return CreatedAtAction(nameof(List), new { }, project);
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProjectDto>> Update(
         int id,
         UpdateProjectRequestBody body,
@@ -46,10 +55,13 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
         var project = await projectService.UpdateAsync(
             new UpdateProjectRequest(id, body.Name, body.Description),
             CurrentUserId,
+            CurrentUserIsAdmin,
             cancellationToken
         );
         return Ok(project);
     }
 }
+
+public record CreateProjectRequestBody(string Name, string? Description);
 
 public record UpdateProjectRequestBody(string Name, string? Description);

@@ -1,0 +1,39 @@
+/* Fallbacks are spelled out because index.css does not define the theme
+   variables the other pages reference yet. */
+.permission-denied {
+  text-align: center;
+  padding: 48px 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.permission-denied-status {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text, #57606a);
+}
+
+.permission-denied-title {
+  margin: 8px 0 0;
+  color: var(--text-h, #1f2328);
+}
+
+.permission-denied-message {
+  margin: 12px 0 24px;
+  color: var(--text, #57606a);
+}
+
+.permission-denied-link {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--border, #d0d7de);
+  border-radius: 6px;
+  color: var(--text-h, #1f2328);
+  text-decoration: none;
+}
+
+.permission-denied-link:hover {
+  border-color: var(--text, #57606a);
+}
