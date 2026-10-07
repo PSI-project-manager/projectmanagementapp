@@ -18,7 +18,7 @@ public class AuthService(
     IConfiguration configuration
 )
 {
-    private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
+    private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(10);
 
     private readonly string signingKey =
         configuration["Jwt:SigningKey"]
