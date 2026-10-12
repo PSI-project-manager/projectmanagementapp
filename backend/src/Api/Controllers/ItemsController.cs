@@ -7,7 +7,6 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/items")]
-[Authorize]
 public class ItemsController(ItemService itemService) : ControllerBase
 {
     [HttpGet]
