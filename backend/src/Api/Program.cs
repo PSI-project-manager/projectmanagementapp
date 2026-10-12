@@ -70,6 +70,9 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IValidator<CreateItemRequest>, CreateItemRequestValidator>();
 builder.Services.AddScoped<ItemService>();
 
+// item import
+builder.Services.AddScoped<ItemImportService>();
+
 // item types
 builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();

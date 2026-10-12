@@ -82,7 +82,7 @@ public class ProjectService(
         return ProjectDto.FromEntity(project);
     }
 
-    private async Task<bool> CanAccessAsync(
+    public async Task<bool> CanAccessAsync(
         int projectId,
         int userId,
         CancellationToken cancellationToken
