@@ -9,9 +9,32 @@ namespace Api.Services;
 public class ItemService(
     AppDbContext db,
     IValidator<CreateItemRequest> createValidator,
-    ItemTypeService itemTypeService
+    ItemTypeService itemTypeService,
+    ProjectService projectService
 )
 {
+    public async Task<IReadOnlyList<ItemDto>> GetItemsFromProjectAsync(
+        int projectId,
+        int currentUserId,
+        CancellationToken ct = default
+    )
+    {
+        var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
+
+        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, ct))
+        {
+            throw new KeyNotFoundException($"Project '{projectId}' was not found.");
+        }
+
+        var items = await db
+            .Items.AsNoTracking()
+            .Where(i => i.Projectid == projectId)
+            .OrderByDescending(i => i.Itemid)
+            .ToListAsync(ct);
+
+        return items.Select(ItemDto.FromEntity).ToList();
+    }
+
     public async Task<ItemDto> CreateAsync(
         CreateItemRequest request,
         CancellationToken ct = default
