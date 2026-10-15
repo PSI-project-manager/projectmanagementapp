@@ -1,12 +1,14 @@
 using Api.Dtos;
 using Api.Extensions;
 using Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/items")]
+[Authorize(Roles="Admin,Contributor")]
 public class ItemsController(ItemService itemService) : ControllerBase
 {
     [HttpGet]
@@ -15,7 +17,7 @@ public class ItemsController(ItemService itemService) : ControllerBase
         CancellationToken ct = default
     )
     {
-        return Ok(await itemService.GetItemsFromProjectAsync(projectId, User.GetUserId(), ct));
+        return Ok(await itemService.GetItemsFromProjectAsync(projectId, User.GetUserId(), User.IsInRole("Admin"), ct));
     }
 
     [HttpPost]

@@ -44,6 +44,7 @@ builder
     .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false; // keep claim names as "role" and not the long URIs
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -52,6 +53,7 @@ builder
             IssuerSigningKey = new SymmetricSecurityKey(
                 System.Text.Encoding.UTF8.GetBytes(signingKey)
             ),
+            RoleClaimType = "role",
         };
     });
 builder.Services.AddAuthorization();

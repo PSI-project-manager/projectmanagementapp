@@ -25,6 +25,7 @@ public class ItemImportController(ItemImportService importService) : ControllerB
             projectId,
             Request.Body,
             User.GetUserId(),
+            User.IsInRole("Admin"),
             cancellationToken
         );
         return Ok(ImportReportDto.FromReport(report));

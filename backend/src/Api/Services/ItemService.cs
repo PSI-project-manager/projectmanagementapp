@@ -16,12 +16,13 @@ public class ItemService(
     public async Task<IReadOnlyList<ItemDto>> GetItemsFromProjectAsync(
         int projectId,
         int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct = default
     )
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, ct))
+        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }

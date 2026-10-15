@@ -17,13 +17,14 @@ public class ItemImportService(
         int projectId,
         Stream csv,
         int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct = default
     )
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
         // same response as a missing project so we don't leak which ids exist
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, ct))
+        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }

@@ -1,4 +1,5 @@
 import type { CreateItemTypeInput, ItemType, UpdateItemTypeInput } from '../../types/itemType'
+import { parse } from '../../services/apiClient'
 
 const BASE_URL = '/api/item-types'
 
@@ -8,15 +9,6 @@ function headers(): HeadersInit {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
-}
-
-async function parse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    // Backend errors are ProblemDetails: { status, title, detail }
-    const problem = await response.json().catch(() => null)
-    throw new Error(problem?.detail || problem?.title || 'Request failed.')
-  }
-  return response.json()
 }
 
 export async function listItemTypes(options?: { activeOnly?: boolean }): Promise<ItemType[]> {

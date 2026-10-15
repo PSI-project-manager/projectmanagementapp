@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import type { User } from '../../types/user'
+import { RoleEditor } from './RoleEditor'
 
 interface UserFormValues {
   email: string
   fullName: string
   password: string
+  roles: string[]
 }
 
 interface UserFormProps {
@@ -17,6 +19,7 @@ export function UserForm({ initialUser, onSubmit, onCancel }: UserFormProps) {
   const [email, setEmail] = useState(initialUser?.email ?? '')
   const [fullName, setFullName] = useState(initialUser?.fullName ?? '')
   const [password, setPassword] = useState('')
+  const [roles, setRoles] = useState<string[]>(initialUser?.roles ?? [])
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -43,11 +46,12 @@ export function UserForm({ initialUser, onSubmit, onCancel }: UserFormProps) {
 
     setSubmitting(true)
     try {
-      await onSubmit({ email, fullName, password })
+      await onSubmit({ email, fullName, password, roles })
       if (!isEditing) {
         setEmail('')
         setFullName('')
         setPassword('')
+        setRoles([])
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
@@ -92,6 +96,8 @@ export function UserForm({ initialUser, onSubmit, onCancel }: UserFormProps) {
           />
         </div>
       )}
+      {/* Roles are only editable on an existing user - POST /api/users takes none. */}
+      {isEditing && <RoleEditor roles={roles} onChange={setRoles} disabled={submitting} />}
       {error && (
         <p className="user-form-error" role="alert">
           {error}
