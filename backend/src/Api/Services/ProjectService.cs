@@ -90,7 +90,7 @@ public class ProjectService(
     }
 
     // admins reach every project; everyone else only the ones they are a member of
-    private async Task<bool> CanAccessAsync(
+    public async Task<bool> CanAccessAsync(
         int projectId,
         int userId,
         bool isAdmin,
