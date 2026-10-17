@@ -44,8 +44,7 @@ All stories with acceptance criteria are in [`user-stories.md`](user-stories.md)
 | US-05 | Create and manage projects    | Implemented — `ProjectsController`; contributors see only their own projects    |
 | US-07 | Define item types             | Implemented — `ItemTypesController`, `ItemTypesPage`, inactive types blocked    |
 | US-09 | Create item                   | Implemented — `ItemsController`, validators, `ItemForm`                         |
-| US-10 | View item list                | Backend + listing per project implemented                                      |
-| Other | US-02, US-06, US-08, US-11 … US-18 | Planned for later sprints, not part of this lab                            |
+| Other | US-?? | Planned for later sprints, not part of this lab                            |
 
 That is 6+ stories fully implemented, against the requirement of 3.
 
