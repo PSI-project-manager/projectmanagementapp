@@ -9,7 +9,7 @@
 | US-04 Assign Roles to Users | + | — |
 | US-05 Create and Manage Projects | +- | Items can be created in projects the user has no access to |
 | US-07 Define Item Types | +- | items can't be edited yet |
-| US-09 Create Item | - | No item list in the UI; status is a raw number input |
+| US-09 Create Item | - | status is a raw number input |
 
 ---
 
