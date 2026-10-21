@@ -7,10 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-/// <summary>
-/// User administration (US-08). Restricting these operations to admins isn't wired up yet,
-/// so every endpoint is currently open — see <c>UsersController</c>.
-/// </summary>
 public class UserService(
     AppDbContext db,
     IValidator<CreateUserRequest> createValidator,
@@ -30,9 +26,17 @@ public class UserService(
             query = query.Where(u => u.Isactive);
         }
 
+        // projected inline rather than through UserDto.FromEntity so EF can translate the
+        // hop through userroles into the same statement
         return await query
             .OrderBy(u => u.Fullname)
-            .Select(u => UserDto.FromEntity(u))
+            .Select(u => new UserDto(
+                u.Userid,
+                u.Email,
+                u.Fullname,
+                u.Isactive,
+                u.Userroles.Select(ur => ur.Role.Name).ToList()
+            ))
             .ToListAsync(ct);
     }
 
@@ -64,7 +68,8 @@ public class UserService(
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 
-        return UserDto.FromEntity(user);
+        // a new user starts with no roles - CreateUserRequest has no roles field
+        return UserDto.FromEntity(user, []);
     }
 
     public async Task<UserDto> UpdateAsync(
@@ -78,14 +83,50 @@ public class UserService(
 
         var normalizedEmail = NormalizeEmail(request.Email);
 
-        var duplicateExists = await db.Users.AnyAsync(
+        bool emailAlreadyExists = await db.Users.AnyAsync(
             u => u.Userid != request.UserId && u.Email.ToLower() == normalizedEmail,
             ct
         );
 
-        if (duplicateExists)
+        if (emailAlreadyExists)
         {
             throw new ValidationException($"A user with email '{normalizedEmail}' already exists.");
+        }
+
+        // ensure all requested role names exist in db
+        List<string> existingRoleNames = await db.Roles.Select(r => r.Name).ToListAsync(ct);
+        List<string> missing = request.Roles.Except(existingRoleNames).ToList();
+        if (missing.Count > 0)
+        {
+            throw new KeyNotFoundException(
+                $"Role(s) '{string.Join("', '", missing)}' do not exist."
+            );
+        }
+
+        // diff current user roles vs the requested ones to find out which mappings of UserRoles table to add/remove
+        var currentUserRoleNames = await db
+            .Userroles.Where(ur => ur.Userid == user.Userid)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync(ct);
+        var roleNamesToAdd = request.Roles.Except(currentUserRoleNames).ToList();
+        var roleNamesToRemove = currentUserRoleNames.Except(request.Roles).ToList();
+
+        // update user
+        var toRemove = await db
+            .Userroles.Where(ur =>
+                ur.Userid == user.Userid && roleNamesToRemove.Contains(ur.Role.Name)
+            )
+            .ToListAsync(ct);
+        db.Userroles.RemoveRange(toRemove);
+
+        var idsToAdd = await db
+            .Roles.Where(r => roleNamesToAdd.Contains(r.Name))
+            .Select(r => r.Roleid)
+            .ToListAsync(ct);
+
+        foreach (var roleId in idsToAdd)
+        {
+            db.Userroles.Add(new Userrole { Userid = user.Userid, Roleid = roleId });
         }
 
         user.Email = normalizedEmail;
@@ -93,7 +134,7 @@ public class UserService(
 
         await db.SaveChangesAsync(ct);
 
-        return UserDto.FromEntity(user);
+        return UserDto.FromEntity(user, request.Roles.Distinct().ToList());
     }
 
     public async Task<UserDto> SetActiveAsync(
@@ -108,7 +149,13 @@ public class UserService(
 
         await db.SaveChangesAsync(ct);
 
-        return UserDto.FromEntity(user);
+        // roles are untouched here, but the dto still has to report them
+        var roleNames = await db
+            .Userroles.Where(ur => ur.Userid == user.Userid)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync(ct);
+
+        return UserDto.FromEntity(user, roleNames);
     }
 
     private async Task<User> FindAsync(int userId, CancellationToken ct) =>

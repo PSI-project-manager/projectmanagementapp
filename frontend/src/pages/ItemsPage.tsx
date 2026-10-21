@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { CreateItemInput, Item, ProjectOption } from '../types/item'
+import { isForbidden } from '../services/apiClient'
+import PermissionDeniedPage from './PermissionDeniedPage'
 import type { ItemType } from '../types/itemType'
 import { createItem, listItems, listProjectOptions } from '../features/items/itemsApi'
 import { listItemTypes } from '../features/itemTypes/itemTypesApi'
@@ -11,6 +13,7 @@ export default function ItemsPage() {
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [forbidden, setForbidden] = useState(false)
   const [createdTitle, setCreatedTitle] = useState<string | null>(null)
 
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
@@ -31,7 +34,12 @@ export default function ItemsPage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setLoadError(err instanceof Error ? err.message : 'Failed to load form data.')
+          // a 403 means the account lacks the role, not that the request was bad
+          if (isForbidden(err)) {
+            setForbidden(true)
+          } else {
+            setLoadError(err instanceof Error ? err.message : 'Failed to load form data.')
+          }
         }
       })
       .finally(() => {
@@ -81,6 +89,10 @@ export default function ItemsPage() {
 
   if (loading) {
     return <p>Loading...</p>
+  }
+
+  if (forbidden) {
+    return <PermissionDeniedPage />
   }
 
   return (

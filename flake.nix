@@ -24,6 +24,7 @@
           packages = [
             # --- Backend (.NET) ---
             dotnet
+            pkgs.roslyn-ls
 
             # --- Frontend (Vite + React) ---
             pkgs.nodejs_22

@@ -1,4 +1,5 @@
 import type { CreateProjectInput, Project, UpdateProjectInput } from '../../types/project'
+import { parse } from '../../services/apiClient'
 
 const BASE_URL = '/api/projects'
 
@@ -8,15 +9,6 @@ function headers(): HeadersInit {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
-}
-
-async function parse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    // Backend errors are ProblemDetails: { status, title, detail }
-    const problem = await response.json().catch(() => null)
-    throw new Error(problem?.detail || problem?.title || 'Request failed.')
-  }
-  return response.json()
 }
 
 // The backend only returns the projects the logged-in user is authorized for
