@@ -108,3 +108,4 @@ Per-member counts for the "≥3 authored and ≥3 reviewed PRs" requirement:
 - The CSV import has an API only; there is no UI for it yet.
 - Automated tests are described in `architecture.md` (`backend/tests/Api.Tests`) but the test
   project is not in the repository yet.
+- No refresh tokens, instead our JWTs are 8 hours long
