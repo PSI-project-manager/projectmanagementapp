@@ -1,0 +1,524 @@
+/* ---------------------------------------------------------------------------
+   Global styles.
+
+   Every page builds the same handful of shapes - a page shell, a form card and
+   a list of rows - so they are styled once here instead of being repeated in a
+   .css file per page. Form controls are styled on the element, which keeps new
+   markup looking right without needing new classes.
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light dark;
+
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e2e5eb;
+  --text-h: #11151c;
+  --text: #5c6472;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-fg: #ffffff;
+  --danger: #c82b37;
+  --ring: rgba(79, 70, 229, 0.35);
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1c232d;
+    --border: #2a313c;
+    --text-h: #e7eaf0;
+    --text: #9aa4b2;
+    --accent: #7f78f2;
+    --accent-hover: #938df5;
+    --accent-fg: #0d1117;
+    --danger: #ff7b72;
+    --ring: rgba(127, 120, 242, 0.4);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-h);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--text-h);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 24px;
+  margin: 0 0 16px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 20px;
+}
+
+h3 {
+  font-size: 16px;
+  margin: 24px 0 12px;
+}
+
+/* Bare paragraphs a page renders on its own - "Loading...", top level errors. */
+#root > p {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  color: var(--text);
+}
+
+/* --- page shell ----------------------------------------------------------- */
+
+.login-page,
+.items-page,
+.item-types-page,
+.projects-page,
+.users-page,
+.permission-denied,
+.home-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+  text-align: left;
+}
+
+/* --- form controls -------------------------------------------------------- */
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 9px 11px;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+input[type='checkbox'] {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: not-allowed;
+}
+
+button {
+  font: inherit;
+  font-weight: 500;
+  padding: 9px 16px;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--text);
+}
+
+/* The submit button is the primary action on every form in the app. */
+button[type='submit'] {
+  color: var(--accent-fg);
+  background: var(--accent);
+  border-color: transparent;
+}
+
+button[type='submit']:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: transparent;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* --- form card ------------------------------------------------------------ */
+
+.login-form,
+.item-form,
+.item-type-form,
+.project-form,
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.login-form-field,
+.item-form-field,
+.item-type-form-field,
+.project-form-field,
+.user-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-type-form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.login-form-actions,
+.item-form-actions,
+.item-type-form-actions,
+.project-form-actions,
+.user-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.login-error,
+.item-form-error,
+.item-type-form-error,
+.project-form-error,
+.user-form-error {
+  margin: 0;
+  font-size: 14px;
+  color: var(--danger);
+}
+
+/* --- lists ---------------------------------------------------------------- */
+
+.item-list,
+.item-type-list,
+.project-list,
+.user-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-list-item,
+.item-type-list-item,
+.project-list-item,
+.user-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s;
+}
+
+.item-list-item:hover,
+.item-type-list-item:hover,
+.project-list-item:hover,
+.user-list-item:hover {
+  border-color: var(--text);
+}
+
+/* Items are stacked text rather than a row with controls. */
+.item-list-item {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.item-list-item h3,
+.project-list-item h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.item-list-item p,
+.project-list-item p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.item-type-list-name,
+.user-list-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.user-list-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-list-email {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.item-type-list-actions,
+.user-list-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.item-type-list-actions button,
+.user-list-actions button,
+.project-list-item button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
+.item-type-badge,
+.user-badge {
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.item-list-empty,
+.item-type-list-empty,
+.project-list-empty,
+.user-list-empty {
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* --- role chips ----------------------------------------------------------- */
+
+.role-chips {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.role-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+}
+
+.role-chip-remove:hover:not(:disabled) {
+  color: var(--accent-fg);
+  background: var(--danger);
+  border-color: transparent;
+}
+
+.role-chips-empty {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* --- login ---------------------------------------------------------------- */
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  max-width: 400px;
+  padding: 24px;
+}
+
+.login-page .login-form {
+  margin-bottom: 0;
+  padding: 28px 24px;
+}
+
+.login-form-actions button {
+  width: 100%;
+}
+
+/* --- home ----------------------------------------------------------------- */
+
+.home-page h1 {
+  margin: 32px 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.home-page h1:first-child {
+  margin-top: 0;
+}
+
+/* The home page is a plain list of links, so each one is drawn as a card. */
+.home-page > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 16px;
+  font-weight: 500;
+  color: var(--text-h);
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.home-page > a::after {
+  content: '→';
+  color: var(--text);
+}
+
+.home-page > a:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.home-page > a:hover::after {
+  color: var(--accent);
+}
+
+/* --- permission denied ---------------------------------------------------- */
+
+.permission-denied {
+  padding-top: 72px;
+  text-align: center;
+}
+
+.permission-denied-status {
+  margin: 0;
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--border);
+}
+
+.permission-denied-title {
+  margin: 12px 0 0;
+}
+
+.permission-denied-message {
+  margin: 12px 0 24px;
+  color: var(--text);
+}
+
+.permission-denied-link {
+  display: inline-block;
+  padding: 9px 16px;
+  font-weight: 500;
+  color: var(--accent-fg);
+  text-decoration: none;
+  background: var(--accent);
+  border-radius: 8px;
+}
+
+.permission-denied-link:hover {
+  background: var(--accent-hover);
+}

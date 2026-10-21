@@ -9,7 +9,6 @@ import {
 } from '../features/itemTypes/itemTypesApi'
 import { ItemTypeForm } from '../features/itemTypes/ItemTypeForm'
 import { ItemTypeList } from '../features/itemTypes/ItemTypeList'
-import './ItemTypesPage.css'
 
 export default function ItemTypesPage() {
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])

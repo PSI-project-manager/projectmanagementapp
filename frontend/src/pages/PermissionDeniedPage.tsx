@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import './PermissionDeniedPage.css'
 
 interface PermissionDeniedPageProps {
   /** Message from the failed request, when there is one worth showing. */

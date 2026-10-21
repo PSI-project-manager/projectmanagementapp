@@ -3,7 +3,7 @@ import { hasRole } from "../services/session";
 
 export default function HomePage() {
     return(
-        <div>
+        <div className="home-page">
             <h1> Contribute </h1>
             <Link to="/projects">View projects</Link>
             <Link to="/items/new">Create new item</Link>

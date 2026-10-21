@@ -10,7 +10,6 @@ import {
 } from '../features/users/usersApi'
 import { UserForm } from '../features/users/UserForm'
 import { UserList } from '../features/users/UserList'
-import './UsersPage.css'
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
