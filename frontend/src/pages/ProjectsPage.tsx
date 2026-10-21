@@ -5,7 +5,6 @@ import type { Project } from '../types/project'
 import { createProject, listProjects, updateProject } from '../features/projects/projectsApi'
 import { ProjectForm } from '../features/projects/ProjectForm'
 import { ProjectList } from '../features/projects/ProjectList'
-import './ProjectsPage.css'
 
 /**
  * Projects screen (list + create/edit form). The list only contains the projects the
