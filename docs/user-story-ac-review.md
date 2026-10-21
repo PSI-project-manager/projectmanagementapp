@@ -35,6 +35,4 @@ A deactivated user can't log in again, but a token they already have stays valid
 
 ### US-09 — Create Item
 
-- There's no item list in the UI. `GET /api/items?projectId=` exists on the backend, but no page uses it.
-- The form has no validation of its own. The backend blocks missing fields, but the user sees one combined error message and empty dropdowns are sent as `0`.
 - Status is a raw number input until US-08 (statuses) is done.
