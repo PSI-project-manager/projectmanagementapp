@@ -55,6 +55,12 @@ public static class DevDataSeeder
             testPassword,
             ["Admin", "Contributor"]
         );
+
+        // hardcode one item status for now so we can demo adding items - temporary solution,
+        // will add better status management and probably rename it to something more obvious later
+
+        db.Statuses.Add(new Status { Name = "To Do", Sortorder = 1, Isactive = true });
+        db.SaveChanges();
     }
 
     // creates and activates a user, used for hardcoding admins into the app or testing.
