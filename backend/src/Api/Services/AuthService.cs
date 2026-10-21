@@ -82,13 +82,14 @@ public class AuthService(
           new(JwtRegisteredClaimNames.Sub, user.Userid.ToString()),
           new(JwtRegisteredClaimNames.Email, user.Email),
         };
-        claims.AddRange(userRoles.Select(name => new Claim("role", name)));
 
         var token = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.UtcNow.Add(TokenLifetime),
             signingCredentials: credentials
         );
+
+        token.Payload["role"] = userRoles.ToArray();
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
