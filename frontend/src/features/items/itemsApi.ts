@@ -23,3 +23,8 @@ export async function listProjectOptions(): Promise<ProjectOption[]> {
   const response = await fetch('/api/projects', { headers: headers() })
   return parse<ProjectOption[]>(response)
 }
+
+export async function listItems(projectId: number): Promise<Item[]> {
+  const response = await fetch(`/api/items?projectId=${projectId}`, { headers: headers() })
+  return parse<Item[]>(response)
+}
