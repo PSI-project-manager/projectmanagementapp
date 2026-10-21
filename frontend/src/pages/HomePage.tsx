@@ -8,10 +8,14 @@ export default function HomePage() {
             <Link to="/projects">View projects</Link>
             <Link to="/items/new">Create new item</Link>
 
-            <h1> Administrate </h1>
-            <Link to="/admin/users">View & manage users</Link>
-            <Link to="/admin/item-types">View & manage item types</Link>
+            {hasRole("Admin") && (
+                <>
+                    <h1> Administrate </h1>
+                    <Link to="/admin/users">View & manage users</Link>
+                    <Link to="/admin/item-types">View & manage item types</Link>
+                </>
+            )}
         </div>
     )
-    
+
 }
