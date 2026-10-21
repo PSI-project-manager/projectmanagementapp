@@ -13,12 +13,12 @@ import PermissionDeniedPage from './pages/PermissionDeniedPage.tsx'
 
 import './index.css'
 import ProtectedRoute from './features/protectedRoutes/ProtectedRoute.tsx'
+import RequireRole from './features/protectedRoutes/RequireRole.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage />} />
@@ -26,9 +26,10 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/items/new" element={<ItemsPage />} />
 
-          <Route path="/admin/item-types" element={<ItemTypesPage />} />
-          <Route path="/admin/users" element={<UsersPage />} />
-          <Route path="/items/new" element={<ItemsPage />} />
+          <Route path="/admin" element={<RequireRole roles={['Admin']} />}>
+            <Route path="item-types" element={<ItemTypesPage />} />
+            <Route path="users" element={<UsersPage />} />
+          </Route>
           <Route path="/forbidden" element={<PermissionDeniedPage />} />
         </Route>
       </Routes>
