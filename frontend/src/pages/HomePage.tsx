@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { hasRole } from "../services/session";
 
 export default function HomePage() {
     return(
