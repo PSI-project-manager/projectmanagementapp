@@ -8,10 +8,12 @@ import ProjectsPage from './pages/ProjectsPage.tsx'
 import ItemTypesPage from './pages/ItemTypesPage.tsx'
 import UsersPage from './pages/UsersPage.tsx'
 import ItemsPage from './pages/ItemsPage.tsx'
+import ItemListPage from './pages/ItemListPage.tsx'
 import PermissionDeniedPage from './pages/PermissionDeniedPage.tsx'
 
 
 import './index.css'
+import './features/items/items.css'
 import ProtectedRoute from './features/protectedRoutes/ProtectedRoute.tsx'
 import RequireRole from './features/protectedRoutes/RequireRole.tsx'
 
@@ -24,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/" element={<HomePage />} />
 
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/items" element={<ItemListPage />} />
           <Route path="/items/new" element={<ItemsPage />} />
 
           <Route path="/admin" element={<RequireRole roles={['Admin']} />}>

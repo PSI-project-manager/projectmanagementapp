@@ -27,13 +27,21 @@ public class ItemService(
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }
 
-        var items = await db
+        return await db
             .Items.AsNoTracking()
             .Where(i => i.Projectid == projectId)
             .OrderByDescending(i => i.Itemid)
+            .Select(i => new ItemDto(
+                i.Itemid,
+                i.Projectid,
+                i.Title,
+                i.Description,
+                i.Itemtypeid,
+                i.Statusid,
+                i.Itemtype.Name,
+                i.Status.Name
+            ))
             .ToListAsync(ct);
-
-        return items.Select(ItemDto.FromEntity).ToList();
     }
 
     public async Task<ItemDto> CreateAsync(

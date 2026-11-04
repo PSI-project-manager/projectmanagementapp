@@ -6,6 +6,7 @@ export default function HomePage() {
         <div className="home-page">
             <h1> Contribute </h1>
             <Link to="/projects">View projects</Link>
+            <Link to="/items">View items</Link>
             <Link to="/items/new">Create new item</Link>
 
             {hasRole("Admin") && (
