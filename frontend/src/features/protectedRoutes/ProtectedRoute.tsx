@@ -1,5 +1,6 @@
 import { jwtDecode } from 'jwt-decode'
 import { Navigate, Outlet } from 'react-router-dom'
+import LogoutButton from '../users/LogoutButton'
 
 function isTokenValid(token: string | null) {
   return !!token && jwtDecode<{ exp: number }>(token).exp * 1000 > Date.now();
@@ -12,5 +13,10 @@ export default function ProtectedRoute( ) {
   if (!isTokenValid(token)) {
     return <Navigate to="/login" replace />;
   }
-  return <Outlet/>
+  return (
+    <>
+      <LogoutButton />
+      <Outlet />
+    </>
+  )
 }
