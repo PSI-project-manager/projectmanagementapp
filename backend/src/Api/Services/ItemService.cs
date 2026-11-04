@@ -10,6 +10,7 @@ public class ItemService(
     AppDbContext db,
     IValidator<CreateItemRequest> createValidator,
     ItemTypeService itemTypeService,
+    StatusService statusService,
     ProjectService projectService
 )
 {
@@ -58,13 +59,7 @@ public class ItemService(
         }
 
         await itemTypeService.EnsureAssignableAsync(request.ItemTypeId, null, ct);
-
-        // TODO (US-08): replace with the status assignability check
-        var statusExists = await db.Statuses.AnyAsync(s => s.Statusid == request.StatusId, ct);
-        if (!statusExists)
-        {
-            throw new KeyNotFoundException($"Status '{request.StatusId}' was not found.");
-        }
+        await statusService.EnsureAssignableAsync(request.StatusId, null, ct);
 
         var item = new Item
         {
