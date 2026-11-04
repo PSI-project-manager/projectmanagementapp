@@ -85,6 +85,11 @@ builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValid
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddScoped<UserService>();
 
+// statuses
+builder.Services.AddScoped<IValidator<CreateStatusRequest>, CreateStatusRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateStatusRequest>, UpdateStatusRequestValidator>();
+builder.Services.AddScoped<StatusService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
