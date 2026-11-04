@@ -92,7 +92,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 
-    // make the admin account
+    // apply EF migrations, then make the admin account
+    using (var scope = app.Services.CreateScope())
+    {
+        scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+    }
     DevDataSeeder.Seed(app.Services);
 }
 
