@@ -522,3 +522,10 @@ button:disabled {
 .permission-denied-link:hover {
   background: var(--accent-hover);
 }
+
+.logout-button {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 10;
+}
