@@ -22,18 +22,36 @@ public class ItemService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
+        // same response for "doesn't exist" and "no access" so we don't leak which ids exist
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                projectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }
 
-        var items = await db
+        // projected in SQL so the type and status names come back in the same query
+        return await db
             .Items.AsNoTracking()
             .Where(i => i.Projectid == projectId)
             .OrderByDescending(i => i.Itemid)
+            .Select(i => new ItemDto(
+                i.Itemid,
+                i.Projectid,
+                i.Title,
+                i.Description,
+                i.Itemtypeid,
+                i.Statusid,
+                i.Itemtype.Name,
+                i.Status.Name
+            ))
             .ToListAsync(ct);
-
-        return items.Select(ItemDto.FromEntity).ToList();
     }
 
     public async Task<ItemDto> CreateAsync(
