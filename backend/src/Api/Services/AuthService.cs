@@ -53,8 +53,8 @@ public class AuthService(
         {
             throw new UnauthorizedAccessException("Invalid email or password.");
         }
-        
-        if(!user.Isactive)
+
+        if (!user.Isactive)
         {
             throw new UnauthorizedAccessException("User is not activated.");
         }
@@ -64,10 +64,18 @@ public class AuthService(
             user.Passwordhash = passwordHasher.HashPassword(user, request.Password);
             await db.SaveChangesAsync(cancellationToken);
         }
-        
-        List<string> userRoles= await db.Userroles.Where(ur => ur.Userid == user.Userid).Select(ur => ur.Role.Name).ToListAsync(cancellationToken);
 
-        return new LoginResponse(GenerateToken(user, userRoles), user.Userid, user.Email, user.Fullname);
+        List<string> userRoles = await db
+            .Userroles.Where(ur => ur.Userid == user.Userid)
+            .Select(ur => ur.Role.Name)
+            .ToListAsync(cancellationToken);
+
+        return new LoginResponse(
+            GenerateToken(user, userRoles),
+            user.Userid,
+            user.Email,
+            user.Fullname
+        );
     }
 
     private string GenerateToken(User user, IEnumerable<string> userRoles)
@@ -79,8 +87,8 @@ public class AuthService(
 
         var claims = new List<Claim>
         {
-          new(JwtRegisteredClaimNames.Sub, user.Userid.ToString()),
-          new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Sub, user.Userid.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email),
         };
 
         var token = new JwtSecurityToken(
@@ -93,5 +101,4 @@ public class AuthService(
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
 }
