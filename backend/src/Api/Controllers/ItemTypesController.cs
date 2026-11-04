@@ -11,7 +11,7 @@ namespace Api.Controllers;
 public class ItemTypesController(ItemTypeService itemTypeService) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = "Admin,Contributor")]
+    [Authorize(Roles="Admin,Contributor")]
     public async Task<ActionResult<IEnumerable<ItemTypeDto>>> List(
         [FromQuery] bool activeOnly = false,
         CancellationToken ct = default
@@ -22,7 +22,7 @@ public class ItemTypesController(ItemTypeService itemTypeService) : ControllerBa
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles="Admin")]
     public async Task<ActionResult<ItemTypeDto>> Create(
         [FromBody] CreateItemTypeRequest request,
         CancellationToken ct = default
@@ -33,7 +33,7 @@ public class ItemTypesController(ItemTypeService itemTypeService) : ControllerBa
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles="Admin")]
     public async Task<ActionResult<ItemTypeDto>> Update(
         int id,
         [FromBody] UpdateItemTypeRequestBody body,
