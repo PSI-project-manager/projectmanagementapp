@@ -12,7 +12,7 @@ Clean Architecture — a single `Api` project (`backend/src/Api`) organized as:
 - `Controllers/` — `ControllerBase` MVC controllers, the only place that talks HTTP.
 - `Services/` — business logic (`IProjectService`/`ProjectService`), each depending directly on
   `AppDbContext`. No repository indirection.
-- `Models/` — EF Core entity classes mapped straight to the Postgres schema in `db/schema.sql`.
+- `Models/` — EF Core entity classes the source of truth for the Postgres schema (code-first, EF Core migrations in `Data/Migrations`).
 - `Dtos/` — request/response contracts used at the controller boundary.
 - `Validators/` — FluentValidation validators for the DTOs.
 - `Data/AppDbContext.cs` — the EF Core `DbContext`.
