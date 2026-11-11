@@ -23,7 +23,6 @@ public class ItemImportService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        // same response as a missing project so we don't leak which ids exist
         if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
@@ -31,16 +30,21 @@ public class ItemImportService(
 
         var report = new ImportReport();
 
-        await foreach (var line in csv.ReadCsvLinesAsync(ct))
+        ParallelOptions parallelOptions = new() {
+            MaxDegreeOfParallelism = 4,
+            CancellationToken = ct
+        };
+
+        await Parallel.ForEachAsync(csv.ReadCsvLinesAsync(ct), parallelOptions, async (line, rowCt) =>
         {
             // line 1 is the header
             if (line.LineNumber == 1 || line.IsBlank)
             {
-                continue;
+                return;
             }
 
             report.Add(await ImportLineAsync(projectId, line, ct));
-        }
+        });
 
         return report;
     }
