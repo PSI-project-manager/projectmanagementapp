@@ -7,10 +7,41 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/statuses")]
-[Authorize(Roles = "Admin,Contributor")]
+[Authorize]
 public class StatusesController(StatusService statusService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<StatusDto>>> List(CancellationToken ct = default) =>
-        Ok(await statusService.ListAsync(ct));
+    [Authorize(Roles = "Admin,Contributor")]
+    public async Task<ActionResult<IEnumerable<StatusDto>>> List(
+        [FromQuery] bool activeOnly = false,
+        CancellationToken ct = default
+    ) => Ok(await statusService.ListAsync(activeOnly, ct));
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<StatusDto>> Create(
+        [FromBody] CreateStatusRequest request,
+        CancellationToken ct = default
+    )
+    {
+        var created = await statusService.CreateAsync(request, ct);
+        return CreatedAtAction(nameof(List), new { id = created.Id }, created);
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<StatusDto>> Update(
+        int id,
+        [FromBody] UpdateStatusRequestBody body,
+        CancellationToken ct = default
+    )
+    {
+        var updated = await statusService.UpdateAsync(
+            new UpdateStatusRequest(id, body.Name, body.SortOrder, body.IsActive),
+            ct
+        );
+        return Ok(updated);
+    }
 }
+
+public record UpdateStatusRequestBody(string Name, int SortOrder, bool IsActive);

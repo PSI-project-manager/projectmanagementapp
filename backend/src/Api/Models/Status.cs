@@ -2,6 +2,8 @@ namespace Api.Models;
 
 public partial class Status
 {
+    public const int MaxNameLength = 100;
+
     public int Statusid { get; set; }
 
     public string Name { get; set; } = null!;
