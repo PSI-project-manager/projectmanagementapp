@@ -10,7 +10,7 @@ import UsersPage from './pages/UsersPage.tsx'
 import ItemsPage from './pages/ItemsPage.tsx'
 import ItemListPage from './pages/ItemListPage.tsx'
 import PermissionDeniedPage from './pages/PermissionDeniedPage.tsx'
-
+import StatusesPage from './pages/StatusesPage.tsx'
 
 import './index.css'
 import './features/items/items.css'
@@ -31,6 +31,7 @@ createRoot(document.getElementById('root')!).render(
 
           <Route path="/admin" element={<RequireRole roles={['Admin']} />}>
             <Route path="item-types" element={<ItemTypesPage />} />
+            <Route path="statuses" element={<StatusesPage />} />
             <Route path="users" element={<UsersPage />} />
           </Route>
           <Route path="/forbidden" element={<PermissionDeniedPage />} />

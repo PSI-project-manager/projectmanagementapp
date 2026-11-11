@@ -8,14 +8,18 @@ import { createItem, listItems, listProjectOptions } from '../features/items/ite
 import { listItemTypes } from '../features/itemTypes/itemTypesApi'
 import { ItemForm } from '../features/items/ItemForm'
 import { ItemList } from '../features/items/ItemList'
+import type { Status } from '../types/status'
+import { listStatuses } from '../features/statuses/statusesApi'
 
 export default function ItemsPage() {
   const [projects, setProjects] = useState<ProjectOption[]>([])
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])
+  const [statuses, setStatuses] = useState<Status[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [forbidden, setForbidden] = useState(false)
   const [created, setCreated] = useState<{ title: string; projectId: number } | null>(null)
+
 
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
   const [items, setItems] = useState<Item[]>([])
@@ -26,11 +30,12 @@ export default function ItemsPage() {
   useEffect(() => {
     let cancelled = false
     // Only active types can be assigned to new items.
-    Promise.all([listProjectOptions(), listItemTypes({ activeOnly: true })])
-      .then(([projectData, typeData]) => {
+    Promise.all([listProjectOptions(), listItemTypes({ activeOnly: true }), listStatuses()])
+      .then(([projectData, typeData, statusData]) => {
         if (!cancelled) {
           setProjects(projectData)
           setItemTypes(typeData)
+          setStatuses(statusData)
         }
       })
       .catch((err) => {
@@ -121,6 +126,7 @@ export default function ItemsPage() {
       <ItemForm
         projects={projects}
         itemTypes={itemTypes}
+        statuses={statuses.filter((s) => s.isActive)}
         onSubmit={handleCreate}
         onProjectChange={handleProjectChange}
       />
@@ -133,7 +139,7 @@ export default function ItemsPage() {
               {listError}
             </p>
           )}
-          {listLoading ? <p>Loading items...</p> : <ItemList items={items} itemTypes={itemTypes} />}
+          {listLoading ? <p>Loading items...</p> : <ItemList items={items} itemTypes={itemTypes} statuses={statuses} />}
         </>
       )}
     </section>

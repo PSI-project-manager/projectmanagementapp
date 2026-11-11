@@ -95,6 +95,7 @@ h3 {
 .login-page,
 .items-page,
 .item-types-page,
+.statuses-page,
 .projects-page,
 .users-page,
 .permission-denied,
@@ -202,6 +203,7 @@ button:disabled {
 .login-form,
 .item-form,
 .item-type-form,
+.status-form,
 .project-form,
 .user-form {
   display: flex;
@@ -218,6 +220,7 @@ button:disabled {
 .login-form-field,
 .item-form-field,
 .item-type-form-field,
+.status-form-field,
 .project-form-field,
 .user-form-field {
   display: flex;
@@ -225,7 +228,8 @@ button:disabled {
   gap: 6px;
 }
 
-.item-type-form-checkbox {
+.item-type-form-checkbox
+.status-form-checkbox {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -235,6 +239,7 @@ button:disabled {
 
 .login-form-actions,
 .item-form-actions,
+.status-form-actions,
 .item-type-form-actions,
 .project-form-actions,
 .user-form-actions {
@@ -246,6 +251,7 @@ button:disabled {
 .login-error,
 .item-form-error,
 .item-type-form-error,
+.status-form-error,
 .project-form-error,
 .user-form-error {
   margin: 0;
@@ -258,6 +264,7 @@ button:disabled {
 .item-list,
 .item-type-list,
 .project-list,
+.status-list,
 .user-list {
   list-style: none;
   margin: 0;
@@ -268,6 +275,7 @@ button:disabled {
 }
 
 .item-list-item,
+.status-list-item,
 .item-type-list-item,
 .project-list-item,
 .user-list-item {
@@ -311,6 +319,7 @@ button:disabled {
 }
 
 .item-type-list-name,
+.status-list-name,
 .user-list-name {
   display: flex;
   align-items: center;
@@ -332,6 +341,7 @@ button:disabled {
 }
 
 .item-type-list-actions,
+.status-list-actions,
 .user-list-actions {
   display: flex;
   flex: none;
@@ -339,6 +349,7 @@ button:disabled {
 }
 
 .item-type-list-actions button,
+.status-list-actions button, 
 .user-list-actions button,
 .project-list-item button {
   padding: 6px 12px;

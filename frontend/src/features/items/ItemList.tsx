@@ -3,20 +3,16 @@ import type { ItemType } from '../../types/itemType'
 
 interface ItemListProps {
   items: Item[]
-  itemTypes?: ItemType[]
+  itemTypes: ItemType[]
+  statuses: Status[]
 }
 
-export function ItemList({ items, itemTypes = [] }: ItemListProps) {
+export function ItemList({ items, itemTypes, statuses }: ItemListProps) {
   if (items.length === 0) {
     return <p className="item-list-empty">No items in this project yet.</p>
   }
-
-  const typeName = (item: Item) =>
-    item.itemTypeName ??
-    itemTypes.find((t) => t.id === item.itemTypeId)?.name ??
-    `Type #${item.itemTypeId}`
-
-  const statusName = (item: Item) => item.statusName ?? `Status #${item.statusId}`
+  const statusName = (id: number) => statuses.find((s) => s.id === id)?.name ?? `Status #${id}`
+  const typeName = (id: number) => itemTypes.find((t) => t.id === id)?.name ?? `Type #${id}`
 
   return (
     <ul className="item-list">
@@ -25,7 +21,7 @@ export function ItemList({ items, itemTypes = [] }: ItemListProps) {
           <h3>{item.title}</h3>
           <div className="item-list-meta">
             <span>{typeName(item)}</span>
-            <span className="item-type-badge">{statusName(item)}</span>
+            <span className="item-type-badge">{statusName(item.statusId)}</span>
           </div>
           {item.description && <p>{item.description}</p>}
         </li>
