@@ -61,6 +61,17 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
         return Ok(project);
     }
 
+    [HttpGet("{id:int}/users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IReadOnlyList<UserDto>>> ListUsers(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        var users = await projectService.ListUsersAsync(id, cancellationToken);
+        return Ok(users);
+    }
+
     [HttpPost("{id:int}/users")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddUser(

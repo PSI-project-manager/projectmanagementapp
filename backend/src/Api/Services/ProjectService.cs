@@ -53,6 +53,34 @@ public class ProjectService(
         return ProjectDto.FromEntity(project);
     }
 
+    public async Task<IReadOnlyList<UserDto>> ListUsersAsync(
+        int projectId,
+        CancellationToken cancellationToken
+    )
+    {
+        bool projectExists = await db.Projects.AnyAsync(
+            p => p.Projectid == projectId,
+            cancellationToken
+        );
+        if (!projectExists)
+            throw new KeyNotFoundException("Project doesn't exist.");
+
+        var users = await db
+            .Users.AsNoTracking()
+            .Where(u => u.Projectusers.Any(pu => pu.Projectid == projectId))
+            .OrderBy(u => u.Fullname)
+            .Select(u => new UserDto(
+                u.Userid,
+                u.Email,
+                u.Fullname,
+                u.Isactive,
+                u.Userroles.Select(ur => ur.Role.Name).ToList()
+            ))
+            .ToListAsync(cancellationToken);
+
+        return users;
+    }
+
     public async Task AddUserAsync(
         int userToAddId,
         int projectId,
