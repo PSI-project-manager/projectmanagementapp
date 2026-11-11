@@ -55,7 +55,7 @@ export default function ItemsPage() {
   useEffect(() => {
     if (selectedProjectId === null) return
     let cancelled = false
-    listItems(selectedProjectId)
+    listItems({ projectId: selectedProjectId })
       .then((data) => {
         if (!cancelled) setItems(data)
       })
@@ -87,7 +87,7 @@ export default function ItemsPage() {
     // displayed, so it shows up with the same data (type/status names) as the others.
     if (createdItem.projectId === selectedProjectId) {
       try {
-        setItems(await listItems(createdItem.projectId))
+        setItems(await listItems({ projectId: createdItem.projectId }))
         setListError(null)
       } catch (err) {
         // the item itself was created, so this is a list problem, not a form error

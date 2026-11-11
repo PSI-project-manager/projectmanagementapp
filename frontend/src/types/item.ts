@@ -8,6 +8,7 @@ export interface Item {
   // Filled in by GET /api/items; the create response doesn't have them.
   itemTypeName?: string | null
   statusName?: string | null
+  projectName?: string | null
 }
 
 export interface CreateItemInput {
@@ -21,4 +22,11 @@ export interface CreateItemInput {
 export interface ProjectOption {
   id: number
   name: string
+}
+
+// Every field is optional: no value means "don't filter by this".
+export interface ItemFilters {
+  projectId?: number | null
+  itemTypeId?: number | null
+  statusId?: number | null
 }

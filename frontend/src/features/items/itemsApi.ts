@@ -1,4 +1,4 @@
-import type { CreateItemInput, Item, ProjectOption } from '../../types/item'
+import type { CreateItemInput, Item, ItemFilters, ProjectOption } from '../../types/item'
 import { parse } from '../../services/apiClient'
 
 function headers(): HeadersInit {
@@ -24,7 +24,14 @@ export async function listProjectOptions(): Promise<ProjectOption[]> {
   return parse<ProjectOption[]>(response)
 }
 
-export async function listItems(projectId: number): Promise<Item[]> {
-  const response = await fetch(`/api/items?projectId=${projectId}`, { headers: headers() })
+// With no filters this returns every item the user can access.
+export async function listItems(filters: ItemFilters = {}): Promise<Item[]> {
+  const params = new URLSearchParams()
+  if (filters.projectId != null) params.set('projectId', String(filters.projectId))
+  if (filters.itemTypeId != null) params.set('itemTypeId', String(filters.itemTypeId))
+  if (filters.statusId != null) params.set('statusId', String(filters.statusId))
+
+  const query = params.toString()
+  const response = await fetch(`/api/items${query ? `?${query}` : ''}`, { headers: headers() })
   return parse<Item[]>(response)
 }

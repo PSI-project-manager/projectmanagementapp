@@ -80,6 +80,9 @@ builder.Services.AddScoped<IValidator<CreateItemTypeRequest>, CreateItemTypeRequ
 builder.Services.AddScoped<IValidator<UpdateItemTypeRequest>, UpdateItemTypeRequestValidator>();
 builder.Services.AddScoped<ItemTypeService>();
 
+// statuses
+builder.Services.AddScoped<StatusService>();
+
 // users
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();

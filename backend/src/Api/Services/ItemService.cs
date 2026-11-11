@@ -13,23 +13,54 @@ public class ItemService(
     ProjectService projectService
 )
 {
-    public async Task<IReadOnlyList<ItemDto>> GetItemsFromProjectAsync(
-        int projectId,
+    public async Task<IReadOnlyList<ItemDto>> ListAsync(
+        ItemFilter filter,
         int currentUserId,
         bool currentUserIsAdmin,
         CancellationToken ct = default
     )
     {
-        var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
+        var query = db.Items.AsNoTracking();
 
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
+        // 1) access scope first - filters below can only narrow it down, never widen it
+        if (filter.ProjectId is { } projectId)
         {
-            throw new KeyNotFoundException($"Project '{projectId}' was not found.");
+            var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
+
+            // same response as a missing project so we don't leak which ids exist
+            if (
+                !projectExists
+                || !await projectService.CanAccessAsync(
+                    projectId,
+                    currentUserId,
+                    currentUserIsAdmin,
+                    ct
+                )
+            )
+            {
+                throw new KeyNotFoundException($"Project '{projectId}' was not found.");
+            }
+
+            query = query.Where(i => i.Projectid == projectId);
+        }
+        else if (!currentUserIsAdmin)
+        {
+            // no project picked: everything from the projects the user is a member of
+            query = query.Where(i => i.Project.Projectusers.Any(pu => pu.Userid == currentUserId));
         }
 
-        return await db
-            .Items.AsNoTracking()
-            .Where(i => i.Projectid == projectId)
+        // 2) optional filters
+        if (filter.ItemTypeId is { } itemTypeId)
+        {
+            query = query.Where(i => i.Itemtypeid == itemTypeId);
+        }
+
+        if (filter.StatusId is { } statusId)
+        {
+            query = query.Where(i => i.Statusid == statusId);
+        }
+
+        return await query
             .OrderByDescending(i => i.Itemid)
             .Select(i => new ItemDto(
                 i.Itemid,
@@ -39,7 +70,8 @@ public class ItemService(
                 i.Itemtypeid,
                 i.Statusid,
                 i.Itemtype.Name,
-                i.Status.Name
+                i.Status.Name,
+                i.Project.Name
             ))
             .ToListAsync(ct);
     }

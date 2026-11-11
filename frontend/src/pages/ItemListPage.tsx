@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import type { Item, ProjectOption } from '../types/item'
+import type { ItemType } from '../types/itemType'
+import type { Status } from '../types/status'
 import { isForbidden } from '../services/apiClient'
 import PermissionDeniedPage from './PermissionDeniedPage'
 import { listItems, listProjectOptions } from '../features/items/itemsApi'
+import { listItemTypes } from '../features/itemTypes/itemTypesApi'
+import { listStatuses } from '../features/statuses/statusesApi'
 import { ItemList } from '../features/items/ItemList'
 
 // The result of one items request, tagged with the request it belongs to.
@@ -15,53 +19,69 @@ interface ItemsResult {
   error: string | null
 }
 
+type FilterParam = 'projectId' | 'itemTypeId' | 'statusId'
+
+const parseId = (raw: string | null) => (raw && /^\d+$/.test(raw) ? Number(raw) : null)
+
+// A select shows its placeholder when the id from the URL is not among the options.
+const selectValue = (id: number | null, options: { id: number }[]) =>
+  id !== null && options.some((option) => option.id === id) ? String(id) : ''
+
 export default function ItemListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [projects, setProjects] = useState<ProjectOption[]>([])
-  const [projectsLoading, setProjectsLoading] = useState(true)
-  const [projectsError, setProjectsError] = useState<string | null>(null)
+  const [itemTypes, setItemTypes] = useState<ItemType[]>([])
+  const [statuses, setStatuses] = useState<Status[]>([])
+  const [optionsLoading, setOptionsLoading] = useState(true)
+  const [optionsError, setOptionsError] = useState<string | null>(null)
   const [forbidden, setForbidden] = useState(false)
 
   const [refreshCount, setRefreshCount] = useState(0)
   const [result, setResult] = useState<ItemsResult | null>(null)
 
-  // The selected project lives in the URL (?projectId=3) so reloads and links keep it.
-  const rawProjectId = searchParams.get('projectId')
-  const projectId = rawProjectId && /^\d+$/.test(rawProjectId) ? Number(rawProjectId) : null
-  const requestKey = projectId === null ? null : `${projectId}:${refreshCount}`
+  // The filters live in the URL (?projectId=3&statusId=1) so reloads and links keep them.
+  const projectId = parseId(searchParams.get('projectId'))
+  const itemTypeId = parseId(searchParams.get('itemTypeId'))
+  const statusId = parseId(searchParams.get('statusId'))
+  const hasFilters = projectId !== null || itemTypeId !== null || statusId !== null
+  const requestKey = `${projectId ?? 'all'}:${itemTypeId ?? 'all'}:${statusId ?? 'all'}:${refreshCount}`
 
-  // Projects the user can access (the backend already filters them).
+  // Dropdown data: projects the user can access (the backend already filters them),
+  // item types and statuses.
   useEffect(() => {
     let cancelled = false
-    listProjectOptions()
-      .then((data) => {
-        if (!cancelled) setProjects(data)
+    Promise.all([listProjectOptions(), listItemTypes(), listStatuses()])
+      .then(([projectData, typeData, statusData]) => {
+        if (!cancelled) {
+          setProjects(projectData)
+          setItemTypes(typeData)
+          setStatuses(statusData)
+        }
       })
       .catch((err) => {
         if (!cancelled) {
           if (isForbidden(err)) {
             setForbidden(true)
           } else {
-            setProjectsError(err instanceof Error ? err.message : 'Failed to load projects.')
+            setOptionsError(err instanceof Error ? err.message : 'Failed to load filters.')
           }
         }
       })
       .finally(() => {
-        if (!cancelled) setProjectsLoading(false)
+        if (!cancelled) setOptionsLoading(false)
       })
     return () => {
       cancelled = true
     }
   }, [])
 
-  // Items of the selected project. Runs again on project change and on Refresh.
-  // The backend answers 404 for a project the user has no access to, which is
-  // shown as an error and no items are displayed.
+  // Items matching the current filters. Runs again on filter change and on Refresh.
+  // The backend only ever returns items from projects the user can access, and answers
+  // 404 for an explicitly requested project the user has no access to.
   useEffect(() => {
-    if (projectId === null || requestKey === null) return
     let cancelled = false
-    listItems(projectId)
+    listItems({ projectId, itemTypeId, statusId })
       .then((data) => {
         if (!cancelled) setResult({ key: requestKey, items: data, error: null })
       })
@@ -77,13 +97,21 @@ export default function ItemListPage() {
     return () => {
       cancelled = true
     }
-  }, [projectId, requestKey])
+  }, [projectId, itemTypeId, statusId, requestKey])
 
-  const handleProjectChange = (value: string) => {
-    setSearchParams(value ? { projectId: value } : {})
+  const updateFilter = (name: FilterParam, value: string) => {
+    const next = new URLSearchParams(searchParams)
+    if (value) {
+      next.set(name, value)
+    } else {
+      next.delete(name)
+    }
+    setSearchParams(next)
   }
 
-  if (projectsLoading) {
+  const clearFilters = () => setSearchParams({})
+
+  if (optionsLoading) {
     return <p>Loading...</p>
   }
 
@@ -91,18 +119,19 @@ export default function ItemListPage() {
     return <PermissionDeniedPage />
   }
 
-  const selectedValue =
-    projectId !== null && projects.some((p) => p.id === projectId) ? String(projectId) : ''
-  const itemsLoading = requestKey !== null && result?.key !== requestKey
+  const itemsLoading = result?.key !== requestKey
   const current = result?.key === requestKey ? result : null
+  const emptyMessage = hasFilters
+    ? 'No items match the selected filters.'
+    : 'No items to show yet.'
 
   return (
     <section className="items-page">
       <h2>Items</h2>
 
-      {projectsError && (
+      {optionsError && (
         <p className="item-form-error" role="alert">
-          {projectsError}
+          {optionsError}
         </p>
       )}
 
@@ -111,10 +140,10 @@ export default function ItemListPage() {
           <label htmlFor="items-project">Project</label>
           <select
             id="items-project"
-            value={selectedValue}
-            onChange={(event) => handleProjectChange(event.target.value)}
+            value={selectValue(projectId, projects)}
+            onChange={(event) => updateFilter('projectId', event.target.value)}
           >
-            <option value="">Select a project</option>
+            <option value="">All projects</option>
             {projects.map((project) => (
               <option key={project.id} value={project.id}>
                 {project.name}
@@ -122,11 +151,45 @@ export default function ItemListPage() {
             ))}
           </select>
         </div>
+        <div className="items-toolbar-field">
+          <label htmlFor="items-type">Type</label>
+          <select
+            id="items-type"
+            value={selectValue(itemTypeId, itemTypes)}
+            onChange={(event) => updateFilter('itemTypeId', event.target.value)}
+          >
+            <option value="">All types</option>
+            {itemTypes.map((itemType) => (
+              <option key={itemType.id} value={itemType.id}>
+                {itemType.name}
+                {itemType.isActive ? '' : ' (inactive)'}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="items-toolbar-field">
+          <label htmlFor="items-status">Status</label>
+          <select
+            id="items-status"
+            value={selectValue(statusId, statuses)}
+            onChange={(event) => updateFilter('statusId', event.target.value)}
+          >
+            <option value="">All statuses</option>
+            {statuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="items-toolbar-actions">
+          <button type="button" onClick={clearFilters} disabled={!hasFilters}>
+            Clear filters
+          </button>
           <button
             type="button"
             onClick={() => setRefreshCount((count) => count + 1)}
-            disabled={projectId === null || itemsLoading}
+            disabled={itemsLoading}
           >
             Refresh
           </button>
@@ -136,17 +199,13 @@ export default function ItemListPage() {
         </div>
       </div>
 
-      {projects.length === 0 && !projectsError && (
+      {projects.length === 0 && !optionsError && (
         <p className="item-list-empty">
           No projects to show. Projects you have access to will appear here.
         </p>
       )}
 
-      {projects.length > 0 && projectId === null && (
-        <p className="item-list-empty">Select a project to see its items.</p>
-      )}
-
-      {projectId !== null && itemsLoading && <p>Loading items...</p>}
+      {itemsLoading && <p>Loading items...</p>}
 
       {current?.error && (
         <p className="item-form-error" role="alert">
@@ -159,7 +218,11 @@ export default function ItemListPage() {
           <p className="items-count">
             {current.items.length} {current.items.length === 1 ? 'item' : 'items'}
           </p>
-          <ItemList items={current.items} />
+          <ItemList
+            items={current.items}
+            showProject={projectId === null}
+            emptyMessage={emptyMessage}
+          />
         </>
       )}
     </section>
