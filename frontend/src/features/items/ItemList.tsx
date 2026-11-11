@@ -19,9 +19,11 @@ export function ItemList({ items, itemTypes, statuses }: ItemListProps) {
       {items.map((item) => (
         <li key={item.id} className="item-list-item">
           <h3>{item.title}</h3>
-          <p>
-            {typeName(item.itemTypeId)} · {statusName(item.statusId)}
-          </p>
+          <div className="item-list-meta">
+            <span>{typeName(item)}</span>
+            <span className="item-type-badge">{statusName(item.statusId)}</span>
+          </div>
+          {item.description && <p>{item.description}</p>}
         </li>
       ))}
     </ul>

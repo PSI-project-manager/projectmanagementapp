@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { CreateItemInput, Item, ProjectOption } from '../types/item'
 import { isForbidden } from '../services/apiClient'
 import PermissionDeniedPage from './PermissionDeniedPage'
@@ -17,7 +18,7 @@ export default function ItemsPage() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [forbidden, setForbidden] = useState(false)
-  const [createdTitle, setCreatedTitle] = useState<string | null>(null)
+  const [created, setCreated] = useState<{ title: string; projectId: number } | null>(null)
 
 
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
@@ -84,11 +85,19 @@ export default function ItemsPage() {
   }
 
   const handleCreate = async (values: CreateItemInput) => {
-    const created = await createItem(values)
-    setCreatedTitle(created.title)
-    // Show the new item straight away if it belongs to the project being displayed.
-    if (created.projectId === selectedProjectId) {
-      setItems((current) => [created, ...current])
+    const createdItem = await createItem(values)
+    setCreated({ title: createdItem.title, projectId: createdItem.projectId })
+
+    // Re-read the list from the server when the new item belongs to the project being
+    // displayed, so it shows up with the same data (type/status names) as the others.
+    if (createdItem.projectId === selectedProjectId) {
+      try {
+        setItems(await listItems(createdItem.projectId))
+        setListError(null)
+      } catch (err) {
+        // the item itself was created, so this is a list problem, not a form error
+        setListError(err instanceof Error ? err.message : 'Failed to refresh items.')
+      }
     }
   }
 
@@ -108,7 +117,12 @@ export default function ItemsPage() {
           {loadError}
         </p>
       )}
-      {createdTitle && <p role="status">Item "{createdTitle}" created.</p>}
+      {created && (
+        <p role="status">
+          Item "{created.title}" created.{' '}
+          <Link to={`/items?projectId=${created.projectId}`}>View project items</Link>
+        </p>
+      )}
       <ItemForm
         projects={projects}
         itemTypes={itemTypes}

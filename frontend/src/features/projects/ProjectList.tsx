@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { Project } from '../../types/project'
 
 interface ProjectListProps {
@@ -18,9 +19,14 @@ export function ProjectList({ projects, onEdit }: ProjectListProps) {
             <h3>{project.name}</h3>
             {project.description && <p>{project.description}</p>}
           </div>
-          <button type="button" onClick={() => onEdit(project)}>
-            Edit
-          </button>
+          <div className="project-list-actions">
+            <Link className="link-button" to={`/items?projectId=${project.id}`}>
+              Items
+            </Link>
+            <button type="button" onClick={() => onEdit(project)}>
+              Edit
+            </button>
+          </div>
         </li>
       ))}
     </ul>

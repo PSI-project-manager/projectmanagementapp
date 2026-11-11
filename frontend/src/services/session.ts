@@ -26,3 +26,8 @@ export function getRoles(): string[] {
 export function hasRole(role: string): boolean {
   return getRoles().includes(role)
 }
+
+export function logout() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('userId')
+}
