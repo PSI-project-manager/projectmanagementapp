@@ -1,5 +1,6 @@
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using Api.Services;
 using Api.Validators;
@@ -129,6 +130,11 @@ app.UseExceptionHandler(errorApp =>
         {
             status = StatusCodes.Status401Unauthorized;
             title = "Unauthorized";
+        }
+        else if (exception is PermissionDeniedException)
+        {
+            status = StatusCodes.Status403Forbidden;
+            title = "Forbidden";
         }
 
         // dont show the message for 500 errors

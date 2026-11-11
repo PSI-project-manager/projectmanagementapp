@@ -60,8 +60,45 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
         );
         return Ok(project);
     }
+
+    [HttpGet("{id:int}/users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IReadOnlyList<UserDto>>> ListUsers(
+        int id,
+        CancellationToken cancellationToken
+    )
+    {
+        var users = await projectService.ListUsersAsync(id, cancellationToken);
+        return Ok(users);
+    }
+
+    [HttpPost("{id:int}/users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> AddUser(
+        int id,
+        AddProjectUserRequestBody body,
+        CancellationToken cancellationToken
+    )
+    {
+        await projectService.AddUserAsync(body.UserId, id, CurrentUserIsAdmin, cancellationToken);
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}/users/{userId:int}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> RemoveUser(
+            int id,
+            int userId,
+            CancellationToken cancellationToken
+            )
+    {
+        await projectService.RemoveUserAsync(userId, id, CurrentUserIsAdmin,cancellationToken);
+        return NoContent();
+    }
 }
 
 public record CreateProjectRequestBody(string Name, string? Description);
 
 public record UpdateProjectRequestBody(string Name, string? Description);
+
+public record AddProjectUserRequestBody(int UserId);
