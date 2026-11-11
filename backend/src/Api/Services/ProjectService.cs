@@ -135,10 +135,9 @@ public class ProjectService(
             await db.Projectusers.FirstOrDefaultAsync(
                 pu => pu.Projectid == projectId && pu.Userid == userToRemoveId,
                 cancellationToken
-            )
-            ?? throw new KeyNotFoundException(
-                "User isn't in the project you're trying to remove them from."
             );
+        if (userToRemove is null)
+            return;
 
         db.Projectusers.Remove(userToRemove);
         await db.SaveChangesAsync(cancellationToken);
