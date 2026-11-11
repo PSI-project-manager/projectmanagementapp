@@ -23,6 +23,7 @@ public class ItemImportService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
+        // same response as a missing project
         if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
@@ -37,17 +38,17 @@ public class ItemImportService(
 
         await Parallel.ForEachAsync(csv.ReadCsvLinesAsync(ct), parallelOptions, async (line, ctOfRow) =>
         {
-            await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
-
-            var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
-
             // line 1 is the header
             if (line.LineNumber == 1 || line.IsBlank)
             {
                 return;
             }
 
-            report.Add(await ImportLineAsync(projectId, line, ct, itemService));
+            await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
+
+            var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
+
+            report.Add(await ImportLineAsync(projectId, line, itemService, ctOfRow));
         });
 
         return report;
@@ -56,8 +57,8 @@ public class ItemImportService(
     private async Task<ImportRowResult> ImportLineAsync(
         int projectId,
         CsvLine line,
-        CancellationToken ct,
-        ItemService scopedItemService
+        ItemService scopedItemService,
+        CancellationToken ct
     )
     {
         var parts = line.Text.Split(',', 4, StringSplitOptions.TrimEntries);
