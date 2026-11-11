@@ -10,7 +10,7 @@ namespace Api.Services;
 public class ItemImportService(
     AppDbContext db,
     ProjectService projectService,
-    ItemService itemService
+    IServiceScopeFactory serviceScopeFactory
 )
 {
     public async Task<ImportReport> ImportAsync(
@@ -35,15 +35,19 @@ public class ItemImportService(
             CancellationToken = ct
         };
 
-        await Parallel.ForEachAsync(csv.ReadCsvLinesAsync(ct), parallelOptions, async (line, rowCt) =>
+        await Parallel.ForEachAsync(csv.ReadCsvLinesAsync(ct), parallelOptions, async (line, ctOfRow) =>
         {
+            await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
+
+            var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
+
             // line 1 is the header
             if (line.LineNumber == 1 || line.IsBlank)
             {
                 return;
             }
 
-            report.Add(await ImportLineAsync(projectId, line, ct));
+            report.Add(await ImportLineAsync(projectId, line, ct, itemService));
         });
 
         return report;
@@ -52,7 +56,8 @@ public class ItemImportService(
     private async Task<ImportRowResult> ImportLineAsync(
         int projectId,
         CsvLine line,
-        CancellationToken ct
+        CancellationToken ct,
+        ItemService scopedItemService
     )
     {
         var parts = line.Text.Split(',', 4, StringSplitOptions.TrimEntries);
@@ -92,7 +97,7 @@ public class ItemImportService(
 
         try
         {
-            var created = await itemService.CreateAsync(
+            var created = await scopedItemService.CreateAsync(
                 new CreateItemRequest(
                     Title: parts[0],
                     Description: parts[3],
