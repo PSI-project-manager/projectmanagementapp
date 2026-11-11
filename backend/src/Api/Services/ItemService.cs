@@ -23,7 +23,15 @@ public class ItemService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                projectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }
