@@ -39,25 +39,30 @@ public class ItemImportService(
 
         var report = new ImportReport();
 
-        ParallelOptions parallelOptions = new() {
+        ParallelOptions parallelOptions = new()
+        {
             MaxDegreeOfParallelism = 4,
-            CancellationToken = ct
+            CancellationToken = ct,
         };
 
-        await Parallel.ForEachAsync(csv.ReadCsvLinesAsync(ct), parallelOptions, async (line, ctOfRow) =>
-        {
-            // line 1 is the header
-            if (line.LineNumber == 1 || line.IsBlank)
+        await Parallel.ForEachAsync(
+            csv.ReadCsvLinesAsync(ct),
+            parallelOptions,
+            async (line, ctOfRow) =>
             {
-                return;
+                // line 1 is the header
+                if (line.LineNumber == 1 || line.IsBlank)
+                {
+                    return;
+                }
+
+                await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
+
+                var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
+
+                report.Add(await ImportLineAsync(projectId, line, itemService, ctOfRow));
             }
-
-            await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
-
-            var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
-
-            report.Add(await ImportLineAsync(projectId, line, itemService, ctOfRow));
-        });
+        );
 
         return report;
     }

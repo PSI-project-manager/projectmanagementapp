@@ -19,7 +19,8 @@ public sealed class ImportReport : IEnumerable<ImportRowResult>
         _results.Enqueue(result);
     }
 
-    public IEnumerator<ImportRowResult> GetEnumerator() => _results.OrderBy(r => r.LineNumber).GetEnumerator();
+    public IEnumerator<ImportRowResult> GetEnumerator() =>
+        _results.OrderBy(r => r.LineNumber).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
