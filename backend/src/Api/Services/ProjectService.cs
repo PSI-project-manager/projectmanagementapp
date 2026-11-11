@@ -1,5 +1,6 @@
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -89,11 +90,13 @@ public class ProjectService(
     )
     {
         if (!CanManage(clientIsAdmin))
-            throw new Exception("You don't have permission to add users to this project.");
+            throw new PermissionDeniedException(
+                "You don't have permission to add users to this project."
+            );
 
         bool userExists = await db.Users.AnyAsync(u => u.Userid == userToAddId, cancellationToken);
         if (!userExists)
-            throw new KeyNotFoundException(
+            throw new ValidationException(
                 "User you're trying to add to the project doesn't exist."
             );
 
@@ -102,7 +105,7 @@ public class ProjectService(
             cancellationToken
         );
         if (userAlreadyInSpecifiedProject)
-            throw new Exception("User you're trying to add is already in this project.");
+            throw new ValidationException("User you're trying to add is already in this project.");
 
         var project =
             await db.Projects.FirstOrDefaultAsync(p => p.Projectid == projectId, cancellationToken)
@@ -120,7 +123,9 @@ public class ProjectService(
     )
     {
         if (!CanManage(clientIsAdmin))
-            throw new Exception("You don't have permission to remove users from this project.");
+            throw new PermissionDeniedException(
+                "You don't have permission to remove users from this project."
+            );
 
         var project =
             await db.Projects.FirstOrDefaultAsync(p => p.Projectid == projectId, cancellationToken)
