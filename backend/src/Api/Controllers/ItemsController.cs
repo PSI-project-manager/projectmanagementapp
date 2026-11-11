@@ -33,7 +33,12 @@ public class ItemsController(ItemService itemService) : ControllerBase
         CancellationToken ct = default
     )
     {
-        var created = await itemService.CreateAsync(request, ct);
+        var created = await itemService.CreateAsync(
+            request,
+            User.GetUserId(),
+            User.IsInRole("Admin"),
+            ct
+        );
         return Created($"/api/items/{created.Id}", created);
     }
 }

@@ -47,7 +47,9 @@ public class ItemImportService(
                 continue;
             }
 
-            report.Add(await ImportLineAsync(projectId, line, ct));
+            report.Add(
+                await ImportLineAsync(projectId, line, currentUserId, currentUserIsAdmin, ct)
+            );
         }
 
         return report;
@@ -56,6 +58,8 @@ public class ItemImportService(
     private async Task<ImportRowResult> ImportLineAsync(
         int projectId,
         CsvLine line,
+        int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct
     )
     {
@@ -104,6 +108,8 @@ public class ItemImportService(
                     ItemTypeId: typeId,
                     StatusId: statusId
                 ),
+                currentUserId,
+                currentUserIsAdmin,
                 ct
             );
 
