@@ -131,11 +131,10 @@ public class ProjectService(
             await db.Projects.FirstOrDefaultAsync(p => p.Projectid == projectId, cancellationToken)
             ?? throw new KeyNotFoundException($"Project '{projectId}' was not found.");
 
-        var userToRemove =
-            await db.Projectusers.FirstOrDefaultAsync(
-                pu => pu.Projectid == projectId && pu.Userid == userToRemoveId,
-                cancellationToken
-            );
+        var userToRemove = await db.Projectusers.FirstOrDefaultAsync(
+            pu => pu.Projectid == projectId && pu.Userid == userToRemoveId,
+            cancellationToken
+        );
         if (userToRemove is null)
             return;
 

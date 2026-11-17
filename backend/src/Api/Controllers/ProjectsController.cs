@@ -87,12 +87,12 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
     [HttpDelete("{id:int}/users/{userId:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> RemoveUser(
-            int id,
-            int userId,
-            CancellationToken cancellationToken
-            )
+        int id,
+        int userId,
+        CancellationToken cancellationToken
+    )
     {
-        await projectService.RemoveUserAsync(userId, id, CurrentUserIsAdmin,cancellationToken);
+        await projectService.RemoveUserAsync(userId, id, CurrentUserIsAdmin, cancellationToken);
         return NoContent();
     }
 }
