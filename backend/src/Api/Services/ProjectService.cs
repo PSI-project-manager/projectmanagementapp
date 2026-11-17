@@ -89,7 +89,7 @@ public class ProjectService(
         CancellationToken cancellationToken
     )
     {
-        if (!CanManage(clientIsAdmin))
+        if (!clientIsAdmin)
             throw new PermissionDeniedException(
                 "You don't have permission to add users to this project."
             );
@@ -122,7 +122,7 @@ public class ProjectService(
         CancellationToken cancellationToken
     )
     {
-        if (!CanManage(clientIsAdmin))
+        if (!clientIsAdmin)
             throw new PermissionDeniedException(
                 "You don't have permission to remove users from this project."
             );
@@ -191,17 +191,6 @@ public class ProjectService(
             pu => pu.Projectid == projectId && pu.Userid == userId,
             cancellationToken
         );
-
-    // looks redundant for now, but if we decide to add more complex management logic later
-    // we will just have to change few lines here instead of having to look all over
-    // the project, and i think it's helpful to define the invariant in one place vs
-    // putting isAdmin checks everywhere in methods like RemoveUserAsync and AddUserAsync
-    // because semantically we're checking if the client can manage the project and not if they're
-    // an admin
-    public bool CanManage(bool isAdmin)
-    {
-        return isAdmin;
-    }
 
     private static string? NormalizeDescription(string? description) =>
         string.IsNullOrWhiteSpace(description) ? null : description.Trim();
