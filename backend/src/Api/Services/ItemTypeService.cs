@@ -1,5 +1,6 @@
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -109,9 +110,7 @@ public class ItemTypeService(
 
         if (!type.Isactive)
         {
-            throw new ValidationException(
-                $"Item type '{type.Name}' is inactive and cannot be assigned."
-            );
+            throw new InactiveEntityException("Item type", type.Itemtypeid, type.Name);
         }
     }
 }
