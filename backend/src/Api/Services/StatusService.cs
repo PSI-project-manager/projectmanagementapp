@@ -1,6 +1,7 @@
 using System.Linq;
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -93,8 +94,6 @@ public class StatusService(
             ?? throw new KeyNotFoundException($"Status '{statusId}' was not found.");
 
         if (!status.Isactive)
-            throw new ValidationException(
-                $"Status '{status.Name}' is inactive and cannot be assigned."
-            );
+            throw new InactiveEntityException("Status", status.Name);
     }
 }
