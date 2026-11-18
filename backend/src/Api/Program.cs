@@ -149,12 +149,6 @@ app.UseExceptionHandler(errorApp =>
         problem.Title = title;
         problem.Detail = detail;
 
-        if (exception is InactiveEntityException inactive)
-        {
-            problem.Extensions["entityKind"] = inactive.EntityKind;
-            problem.Extensions["entityId"] = inactive.EntityId;
-        }
-
         context.Response.StatusCode = status;
         await context.Response.WriteAsJsonAsync(problem);
     });

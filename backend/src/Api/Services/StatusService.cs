@@ -94,6 +94,6 @@ public class StatusService(
             ?? throw new KeyNotFoundException($"Status '{statusId}' was not found.");
 
         if (!status.Isactive)
-            throw new InactiveEntityException("Status", status.Statusid, status.Name);
+            throw new InactiveEntityException("Status", status.Name);
     }
 }

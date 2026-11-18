@@ -110,7 +110,7 @@ public class ItemTypeService(
 
         if (!type.Isactive)
         {
-            throw new InactiveEntityException("Item type", type.Itemtypeid, type.Name);
+            throw new InactiveEntityException("Item type", type.Name);
         }
     }
 }
