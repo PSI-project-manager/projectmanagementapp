@@ -5,6 +5,7 @@ import type { ItemType } from '../../types/itemType'
 interface ItemFormProps {
   projects: ProjectOption[]
   itemTypes: ItemType[]
+  statuses: Status[]
   onSubmit: (values: CreateItemInput) => Promise<void>
   onProjectChange?: (projectId: number | null) => void
 }
@@ -13,7 +14,7 @@ type FieldErrors = Partial<
   Record<'title' | 'description' | 'projectId' | 'itemTypeId' | 'statusId', string>
 >
 
-export function ItemForm({ projects, itemTypes, onSubmit, onProjectChange }: ItemFormProps) {
+export function ItemForm({ projects, itemTypes, statuses, onSubmit, onProjectChange }: ItemFormProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [projectId, setProjectId] = useState('')
@@ -30,7 +31,7 @@ export function ItemForm({ projects, itemTypes, onSubmit, onProjectChange }: Ite
     if (!description.trim()) errors.description = 'Description is required.'
     if (!projectId) errors.projectId = 'Project is required.'
     if (!itemTypeId) errors.itemTypeId = 'Item type is required.'
-    if (!(Number(statusId) > 0)) errors.statusId = 'Status is required.'
+    if (!statusId) errors.statusId = 'Status is required.'
     return errors
   }
 
@@ -118,15 +119,20 @@ export function ItemForm({ projects, itemTypes, onSubmit, onProjectChange }: Ite
         </select>
         {fieldErrors.itemTypeId && <p className="item-form-error">{fieldErrors.itemTypeId}</p>}
       </div>
-      {/* TODO (US-08): replace with a status dropdown once there is a statuses endpoint. */}
       <div className="item-form-field">
-        <label htmlFor="item-status">Status ID</label>
-        <input
+        <label htmlFor="item-status">Status</label>
+         <select
           id="item-status"
-          type="number"
           value={statusId}
           onChange={(event) => setStatusId(event.target.value)}
-        />
+          >
+            <option value="">Select a status</option>
+            {statuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.name}
+              </option>
+          ))}
+        </select>
         {fieldErrors.statusId && <p className="item-form-error">{fieldErrors.statusId}</p>}
       </div>
       {error && (
