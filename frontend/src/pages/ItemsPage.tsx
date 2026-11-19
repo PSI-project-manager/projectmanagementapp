@@ -139,7 +139,7 @@ export default function ItemsPage() {
               {listError}
             </p>
           )}
-          {listLoading ? <p>Loading items...</p> : <ItemList items={items} itemTypes={itemTypes} statuses={statuses} />}
+          {listLoading ? <p>Loading items...</p> : <ItemList items={items} itemTypes={itemTypes} />}
         </>
       )}
     </section>
