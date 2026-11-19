@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { CreateItemInput, ProjectOption } from '../../types/item'
 import type { ItemType } from '../../types/itemType'
+import type { Status } from '../../types/status'
 
 interface ItemFormProps {
   projects: ProjectOption[]
