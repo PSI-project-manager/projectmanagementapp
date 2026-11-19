@@ -163,7 +163,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.Statusid).UseIdentityAlwaysColumn().HasColumnName("statusid");
             entity.Property(e => e.Isactive).HasDefaultValue(true).HasColumnName("isactive");
             entity.Property(e => e.Name).HasMaxLength(100).HasColumnName("name");
-            entity.Property(e => e.Sortorder).HasColumnName("sortorder");
+            entity.Property(e => e.Sortorder).HasDefaultValue(0).HasColumnName("sortorder");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -6,6 +6,7 @@ export default function HomePage() {
         <div className="home-page">
             <h1> Contribute </h1>
             <Link to="/projects">View projects</Link>
+            <Link to="/items">View items</Link>
             <Link to="/items/new">Create new item</Link>
 
             {hasRole("Admin") && (
@@ -13,6 +14,7 @@ export default function HomePage() {
                     <h1> Administrate </h1>
                     <Link to="/admin/users">View & manage users</Link>
                     <Link to="/admin/item-types">View & manage item types</Link>
+                    <Link to="/admin/statuses">View & manage statuses</Link>
                 </>
             )}
         </div>

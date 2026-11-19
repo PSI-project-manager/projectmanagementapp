@@ -35,12 +35,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    # necessary for scaffolding
+    # for connecting to the db directly
     ports:
       - "5432:5432"
     volumes:
       - projectmanagementapp_pgdata:/var/lib/postgresql/
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,z
     healthcheck:
           test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
           interval: 5s

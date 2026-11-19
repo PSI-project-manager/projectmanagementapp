@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { CreateItemInput, Item, ProjectOption } from '../types/item'
 import { isForbidden } from '../services/apiClient'
 import PermissionDeniedPage from './PermissionDeniedPage'
@@ -7,14 +8,18 @@ import { createItem, listItems, listProjectOptions } from '../features/items/ite
 import { listItemTypes } from '../features/itemTypes/itemTypesApi'
 import { ItemForm } from '../features/items/ItemForm'
 import { ItemList } from '../features/items/ItemList'
+import type { Status } from '../types/status'
+import { listStatuses } from '../features/statuses/statusesApi'
 
 export default function ItemsPage() {
   const [projects, setProjects] = useState<ProjectOption[]>([])
   const [itemTypes, setItemTypes] = useState<ItemType[]>([])
+  const [statuses, setStatuses] = useState<Status[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [forbidden, setForbidden] = useState(false)
-  const [createdTitle, setCreatedTitle] = useState<string | null>(null)
+  const [created, setCreated] = useState<{ title: string; projectId: number } | null>(null)
+
 
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null)
   const [items, setItems] = useState<Item[]>([])
@@ -25,11 +30,12 @@ export default function ItemsPage() {
   useEffect(() => {
     let cancelled = false
     // Only active types can be assigned to new items.
-    Promise.all([listProjectOptions(), listItemTypes({ activeOnly: true })])
-      .then(([projectData, typeData]) => {
+    Promise.all([listProjectOptions(), listItemTypes({ activeOnly: true }), listStatuses()])
+      .then(([projectData, typeData, statusData]) => {
         if (!cancelled) {
           setProjects(projectData)
           setItemTypes(typeData)
+          setStatuses(statusData)
         }
       })
       .catch((err) => {
@@ -79,11 +85,19 @@ export default function ItemsPage() {
   }
 
   const handleCreate = async (values: CreateItemInput) => {
-    const created = await createItem(values)
-    setCreatedTitle(created.title)
-    // Show the new item straight away if it belongs to the project being displayed.
-    if (created.projectId === selectedProjectId) {
-      setItems((current) => [created, ...current])
+    const createdItem = await createItem(values)
+    setCreated({ title: createdItem.title, projectId: createdItem.projectId })
+
+    // Re-read the list from the server when the new item belongs to the project being
+    // displayed, so it shows up with the same data (type/status names) as the others.
+    if (createdItem.projectId === selectedProjectId) {
+      try {
+        setItems(await listItems(createdItem.projectId))
+        setListError(null)
+      } catch (err) {
+        // the item itself was created, so this is a list problem, not a form error
+        setListError(err instanceof Error ? err.message : 'Failed to refresh items.')
+      }
     }
   }
 
@@ -103,10 +117,16 @@ export default function ItemsPage() {
           {loadError}
         </p>
       )}
-      {createdTitle && <p role="status">Item "{createdTitle}" created.</p>}
+      {created && (
+        <p role="status">
+          Item "{created.title}" created.{' '}
+          <Link to={`/items?projectId=${created.projectId}`}>View project items</Link>
+        </p>
+      )}
       <ItemForm
         projects={projects}
         itemTypes={itemTypes}
+        statuses={statuses.filter((s) => s.isActive)}
         onSubmit={handleCreate}
         onProjectChange={handleProjectChange}
       />

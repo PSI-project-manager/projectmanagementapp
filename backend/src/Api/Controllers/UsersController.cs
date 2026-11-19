@@ -7,7 +7,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles="Admin")]
+[Authorize(Roles = "Admin")]
 public class UsersController(UserService userService) : ControllerBase
 {
     [HttpGet]

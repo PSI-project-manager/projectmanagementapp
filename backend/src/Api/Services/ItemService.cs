@@ -10,6 +10,7 @@ public class ItemService(
     AppDbContext db,
     IValidator<CreateItemRequest> createValidator,
     ItemTypeService itemTypeService,
+    StatusService statusService,
     ProjectService projectService
 )
 {
@@ -22,41 +23,63 @@ public class ItemService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                projectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }
 
-        var items = await db
+        return await db
             .Items.AsNoTracking()
             .Where(i => i.Projectid == projectId)
             .OrderByDescending(i => i.Itemid)
+            .Select(i => new ItemDto(
+                i.Itemid,
+                i.Projectid,
+                i.Title,
+                i.Description,
+                i.Itemtypeid,
+                i.Statusid,
+                i.Itemtype.Name,
+                i.Status.Name
+            ))
             .ToListAsync(ct);
-
-        return items.Select(ItemDto.FromEntity).ToList();
     }
 
     public async Task<ItemDto> CreateAsync(
         CreateItemRequest request,
+        int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct = default
     )
     {
         await createValidator.ValidateAndThrowAsync(request, ct);
 
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == request.ProjectId, ct);
-        if (!projectExists)
+
+        // same response as a missing project so we don't leak which ids exist
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                request.ProjectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{request.ProjectId}' was not found.");
         }
 
         await itemTypeService.EnsureAssignableAsync(request.ItemTypeId, null, ct);
-
-        // TODO (US-08): replace with the status assignability check
-        var statusExists = await db.Statuses.AnyAsync(s => s.Statusid == request.StatusId, ct);
-        if (!statusExists)
-        {
-            throw new KeyNotFoundException($"Status '{request.StatusId}' was not found.");
-        }
+        await statusService.EnsureAssignableAsync(request.StatusId, null, ct);
 
         var item = new Item
         {

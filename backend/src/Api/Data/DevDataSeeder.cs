@@ -59,7 +59,14 @@ public static class DevDataSeeder
         // hardcode one item status for now so we can demo adding items - temporary solution,
         // will add better status management and probably rename it to something more obvious later
 
-        db.Statuses.Add(new Status { Name = "To Do", Sortorder = 1, Isactive = true });
+        db.Statuses.Add(
+            new Status
+            {
+                Name = "To Do",
+                Sortorder = 1,
+                Isactive = true,
+            }
+        );
         db.SaveChanges();
     }
 

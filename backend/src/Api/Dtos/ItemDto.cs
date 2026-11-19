@@ -8,7 +8,9 @@ public record ItemDto(
     string Title,
     string? Description,
     int ItemTypeId,
-    int StatusId
+    int StatusId,
+    string? ItemTypeName = null,
+    string? StatusName = null
 )
 {
     public static ItemDto FromEntity(Item item) =>
@@ -18,6 +20,8 @@ public record ItemDto(
             item.Title,
             item.Description,
             item.Itemtypeid,
-            item.Statusid
+            item.Statusid,
+            item.Itemtype?.Name,
+            item.Status?.Name
         );
 }

@@ -1,6 +1,7 @@
 using System.Globalization;
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Imports;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ namespace Api.Services;
 public class ItemImportService(
     AppDbContext db,
     ProjectService projectService,
-    ItemService itemService
+    IServiceScopeFactory serviceScopeFactory
 )
 {
     public async Task<ImportReport> ImportAsync(
@@ -23,24 +24,54 @@ public class ItemImportService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        // same response as a missing project so we don't leak which ids exist
-        if (!projectExists || !await projectService.CanAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct))
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                projectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{projectId}' was not found.");
         }
 
         var report = new ImportReport();
 
-        await foreach (var line in csv.ReadCsvLinesAsync(ct))
+        ParallelOptions parallelOptions = new()
         {
-            // line 1 is the header
-            if (line.LineNumber == 1 || line.IsBlank)
-            {
-                continue;
-            }
+            MaxDegreeOfParallelism = 4,
+            CancellationToken = ct,
+        };
 
-            report.Add(await ImportLineAsync(projectId, line, ct));
-        }
+        await Parallel.ForEachAsync(
+            csv.ReadCsvLinesAsync(ct),
+            parallelOptions,
+            async (line, ctOfRow) =>
+            {
+                // line 1 is the header
+                if (line.LineNumber == 1 || line.IsBlank)
+                {
+                    return;
+                }
+
+                await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
+
+                var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
+
+                report.Add(
+                    await ImportLineAsync(
+                        projectId,
+                        line,
+                        itemService,
+                        currentUserId,
+                        currentUserIsAdmin,
+                        ctOfRow
+                    )
+                );
+            }
+        );
 
         return report;
     }
@@ -48,6 +79,9 @@ public class ItemImportService(
     private async Task<ImportRowResult> ImportLineAsync(
         int projectId,
         CsvLine line,
+        ItemService scopedItemService,
+        int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct
     )
     {
@@ -88,7 +122,7 @@ public class ItemImportService(
 
         try
         {
-            var created = await itemService.CreateAsync(
+            var created = await scopedItemService.CreateAsync(
                 new CreateItemRequest(
                     Title: parts[0],
                     Description: parts[3],
@@ -96,6 +130,8 @@ public class ItemImportService(
                     ItemTypeId: typeId,
                     StatusId: statusId
                 ),
+                currentUserId,
+                currentUserIsAdmin,
                 ct
             );
 
@@ -109,9 +145,12 @@ public class ItemImportService(
         {
             return ImportRowResult.Failed(line.LineNumber, ex.Message);
         }
+        catch (InactiveEntityException ex)
+        {
+            return ImportRowResult.Failed(line.LineNumber, ex.Message);
+        }
     }
 
-    // ItemService throws plain-message ValidationExceptions (no Errors) for inactive types
     private static string Describe(ValidationException ex) =>
         ex.Errors.Any() ? string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)) : ex.Message;
 }

@@ -67,6 +67,7 @@ builder.Services.AddScoped<ProjectService>();
 // login
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<AuthService>();
 
 // items
@@ -86,6 +87,11 @@ builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValid
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserRequestValidator>();
 builder.Services.AddScoped<UserService>();
 
+// statuses
+builder.Services.AddScoped<IValidator<CreateStatusRequest>, CreateStatusRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateStatusRequest>, UpdateStatusRequestValidator>();
+builder.Services.AddScoped<StatusService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -93,7 +99,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 
-    // make the admin account
+    // apply EF migrations, then make the admin account
+    using (var scope = app.Services.CreateScope())
+    {
+        scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+    }
     DevDataSeeder.Seed(app.Services);
 }
 
@@ -126,6 +136,11 @@ app.UseExceptionHandler(errorApp =>
         {
             status = StatusCodes.Status403Forbidden;
             title = "Forbidden";
+        }
+        else if (exception is InactiveEntityException)
+        {
+            status = StatusCodes.Status409Conflict;
+            title = "Entity is inactive";
         }
 
         // dont show the message for 500 errors
