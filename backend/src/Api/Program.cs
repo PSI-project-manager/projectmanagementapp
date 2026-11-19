@@ -67,6 +67,7 @@ builder.Services.AddScoped<ProjectService>();
 // login
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<AuthService>();
 
 // items
