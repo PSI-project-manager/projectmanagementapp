@@ -11,7 +11,7 @@ namespace Api.Services;
 public class ItemImportService(
     AppDbContext db,
     ProjectService projectService,
-    ItemService itemService
+    IServiceScopeFactory serviceScopeFactory
 )
 {
     public async Task<ImportReport> ImportAsync(
@@ -39,18 +39,39 @@ public class ItemImportService(
 
         var report = new ImportReport();
 
-        await foreach (var line in csv.ReadCsvLinesAsync(ct))
+        ParallelOptions parallelOptions = new()
         {
-            // line 1 is the header
-            if (line.LineNumber == 1 || line.IsBlank)
-            {
-                continue;
-            }
+            MaxDegreeOfParallelism = 4,
+            CancellationToken = ct,
+        };
 
-            report.Add(
-                await ImportLineAsync(projectId, line, currentUserId, currentUserIsAdmin, ct)
-            );
-        }
+        await Parallel.ForEachAsync(
+            csv.ReadCsvLinesAsync(ct),
+            parallelOptions,
+            async (line, ctOfRow) =>
+            {
+                // line 1 is the header
+                if (line.LineNumber == 1 || line.IsBlank)
+                {
+                    return;
+                }
+
+                await using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
+
+                var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
+
+                report.Add(
+                    await ImportLineAsync(
+                        projectId,
+                        line,
+                        itemService,
+                        currentUserId,
+                        currentUserIsAdmin,
+                        ctOfRow
+                    )
+                );
+            }
+        );
 
         return report;
     }
@@ -58,6 +79,7 @@ public class ItemImportService(
     private async Task<ImportRowResult> ImportLineAsync(
         int projectId,
         CsvLine line,
+        ItemService scopedItemService,
         int currentUserId,
         bool currentUserIsAdmin,
         CancellationToken ct
@@ -100,7 +122,7 @@ public class ItemImportService(
 
         try
         {
-            var created = await itemService.CreateAsync(
+            var created = await scopedItemService.CreateAsync(
                 new CreateItemRequest(
                     Title: parts[0],
                     Description: parts[3],
