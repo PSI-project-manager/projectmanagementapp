@@ -132,6 +132,11 @@ app.UseExceptionHandler(errorApp =>
             status = StatusCodes.Status401Unauthorized;
             title = "Unauthorized";
         }
+        else if (exception is PermissionDeniedException)
+        {
+            status = StatusCodes.Status403Forbidden;
+            title = "Forbidden";
+        }
         else if (exception is InactiveEntityException)
         {
             status = StatusCodes.Status409Conflict;
