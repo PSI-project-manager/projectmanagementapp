@@ -41,4 +41,29 @@ public class ItemsController(ItemService itemService) : ControllerBase
         );
         return Created($"/api/items/{created.Id}", created);
     }
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<ItemDto>> Update(
+        int id,
+        [FromBody] UpdateItemRequestBody body,
+        CancellationToken ct = default
+    )
+    {
+        var request = new UpdateItemRequest(
+            id,
+            body.Title,
+            body.Description,
+            body.ItemTypeId,
+            body.StatusId
+        );
+        var updated = await itemService.UpdateAsync(
+            request,
+            User.GetUserId(),
+            User.IsInRole("Admin"),
+            ct
+        );
+        return Ok(updated);
+    }
 }
+
+public record UpdateItemRequestBody(string Title, string Description, int ItemTypeId, int StatusId);

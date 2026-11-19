@@ -9,6 +9,7 @@ namespace Api.Services;
 public class ItemService(
     AppDbContext db,
     IValidator<CreateItemRequest> createValidator,
+    IValidator<UpdateItemRequest> updateValidator,
     ItemTypeService itemTypeService,
     StatusService statusService,
     ProjectService projectService
@@ -92,6 +93,47 @@ public class ItemService(
 
         db.Items.Add(item);
         await db.SaveChangesAsync(ct);
+
+        return ItemDto.FromEntity(item);
+    }
+
+    public async Task<ItemDto> UpdateAsync(
+        UpdateItemRequest request,
+        int currentUserId,
+        bool currentUserIsAdmin,
+        CancellationToken ct = default
+    )
+    {
+        await updateValidator.ValidateAndThrowAsync(request, ct);
+
+        var item =
+            await db.Items.FirstOrDefaultAsync(i => i.Itemid == request.ItemId, ct)
+            ?? throw new KeyNotFoundException($"Item '{request.ItemId}' was not found.");
+
+        if (
+            !await projectService.CanAccessAsync(
+                item.Projectid,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
+        {
+            throw new KeyNotFoundException($"Item '{request.ItemId}' was not found.");
+        }
+
+        await itemTypeService.EnsureAssignableAsync(request.ItemTypeId, item.Itemtypeid, ct);
+        await statusService.EnsureAssignableAsync(request.StatusId, item.Statusid, ct);
+
+        item.Title = request.Title.Trim();
+        item.Description = request.Description.Trim();
+        item.Itemtypeid = request.ItemTypeId;
+        item.Statusid = request.StatusId;
+
+        await db.SaveChangesAsync(ct);
+
+        await db.Entry(item).Reference(i => i.Itemtype).LoadAsync(ct);
+        await db.Entry(item).Reference(i => i.Status).LoadAsync(ct);
 
         return ItemDto.FromEntity(item);
     }
