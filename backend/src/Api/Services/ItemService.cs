@@ -55,13 +55,25 @@ public class ItemService(
 
     public async Task<ItemDto> CreateAsync(
         CreateItemRequest request,
+        int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct = default
     )
     {
         await createValidator.ValidateAndThrowAsync(request, ct);
 
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == request.ProjectId, ct);
-        if (!projectExists)
+
+        // same response as a missing project so we don't leak which ids exist
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                request.ProjectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
         {
             throw new KeyNotFoundException($"Project '{request.ProjectId}' was not found.");
         }
