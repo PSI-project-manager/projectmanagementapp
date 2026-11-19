@@ -15,7 +15,8 @@ public class AuthService(
     AppDbContext db,
     IValidator<LoginRequest> validator,
     PasswordHasher<User> passwordHasher,
-    IConfiguration configuration
+    IConfiguration configuration,
+    TimeProvider timeProvider
 )
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromHours(8);
@@ -93,7 +94,7 @@ public class AuthService(
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.Add(TokenLifetime),
+            expires: timeProvider.GetUtcNow().UtcDateTime.Add(TokenLifetime),
             signingCredentials: credentials
         );
 

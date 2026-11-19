@@ -1,6 +1,7 @@
 using System.Globalization;
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Imports;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,6 @@ public class ItemImportService(
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
 
-        // same response as a missing project so we don't leak which ids exist
         if (
             !projectExists
             || !await projectService.CanAccessAsync(
@@ -60,7 +60,16 @@ public class ItemImportService(
 
                 var itemService = scope.ServiceProvider.GetRequiredService<ItemService>();
 
-                report.Add(await ImportLineAsync(projectId, line, itemService, ctOfRow));
+                report.Add(
+                    await ImportLineAsync(
+                        projectId,
+                        line,
+                        itemService,
+                        currentUserId,
+                        currentUserIsAdmin,
+                        ctOfRow
+                    )
+                );
             }
         );
 
@@ -71,6 +80,8 @@ public class ItemImportService(
         int projectId,
         CsvLine line,
         ItemService scopedItemService,
+        int currentUserId,
+        bool currentUserIsAdmin,
         CancellationToken ct
     )
     {
@@ -119,6 +130,8 @@ public class ItemImportService(
                     ItemTypeId: typeId,
                     StatusId: statusId
                 ),
+                currentUserId,
+                currentUserIsAdmin,
                 ct
             );
 
@@ -132,9 +145,12 @@ public class ItemImportService(
         {
             return ImportRowResult.Failed(line.LineNumber, ex.Message);
         }
+        catch (InactiveEntityException ex)
+        {
+            return ImportRowResult.Failed(line.LineNumber, ex.Message);
+        }
     }
 
-    // ItemService throws plain-message ValidationExceptions (no Errors) for inactive types
     private static string Describe(ValidationException ex) =>
         ex.Errors.Any() ? string.Join(" ", ex.Errors.Select(e => e.ErrorMessage)) : ex.Message;
 }

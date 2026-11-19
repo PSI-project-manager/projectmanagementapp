@@ -1,6 +1,7 @@
 using System.Linq;
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +70,12 @@ public class StatusService(
             );
 
         var name = request.Name.Trim();
-        if (await db.Statuses.AnyAsync(s => s.Name.ToLower() == name.ToLower(), ct))
+        if (
+            await db.Statuses.AnyAsync(
+                s => s.Name.ToLower() == name.ToLower() && s.Statusid != request.StatusId,
+                ct
+            )
+        )
             throw new ValidationException($"A status named '{name}' already exists.");
 
         entity.Name = name;
@@ -93,8 +99,6 @@ public class StatusService(
             ?? throw new KeyNotFoundException($"Status '{statusId}' was not found.");
 
         if (!status.Isactive)
-            throw new ValidationException(
-                $"Status '{status.Name}' is inactive and cannot be assigned."
-            );
+            throw new InactiveEntityException("Status", status.Name);
     }
 }

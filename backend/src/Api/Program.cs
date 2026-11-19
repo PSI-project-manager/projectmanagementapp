@@ -1,5 +1,6 @@
 using Api.Data;
 using Api.Dtos;
+using Api.Exceptions;
 using Api.Models;
 using Api.Services;
 using Api.Validators;
@@ -66,6 +67,7 @@ builder.Services.AddScoped<ProjectService>();
 // login
 builder.Services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
 builder.Services.AddSingleton<PasswordHasher<User>>();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<AuthService>();
 
 // items
@@ -129,6 +131,11 @@ app.UseExceptionHandler(errorApp =>
         {
             status = StatusCodes.Status401Unauthorized;
             title = "Unauthorized";
+        }
+        else if (exception is InactiveEntityException)
+        {
+            status = StatusCodes.Status409Conflict;
+            title = "Entity is inactive";
         }
 
         // dont show the message for 500 errors
