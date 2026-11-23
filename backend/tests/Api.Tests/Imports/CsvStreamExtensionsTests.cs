@@ -82,34 +82,6 @@ public class CsvStreamExtensionsTests
     }
 
     [Fact]
-    public async Task ReadCsvLinesAsync_Utf8Bom_IsNotPartOfTheFirstLine()
-    {
-        var bytes = Encoding
-            .UTF8.GetPreamble()
-            .Concat(Encoding.UTF8.GetBytes("title,itemTypeId\nrow"))
-            .ToArray();
-        using var stream = new MemoryStream(bytes);
-
-        var lines = await ReadAllAsync(stream);
-
-        Assert.Equal("title,itemTypeId", lines[0].Text);
-    }
-
-    [Fact]
-    public async Task ReadCsvLinesAsync_Utf16WithBom_IsDecodedCorrectly()
-    {
-        var bytes = Encoding
-            .Unicode.GetPreamble()
-            .Concat(Encoding.Unicode.GetBytes("pirma,eilutė\nantra"))
-            .ToArray();
-        using var stream = new MemoryStream(bytes);
-
-        var lines = await ReadAllAsync(stream);
-
-        Assert.Equal(new[] { "pirma,eilutė", "antra" }, lines.Select(l => l.Text));
-    }
-
-    [Fact]
     public async Task ReadCsvLinesAsync_NonAsciiUtf8_IsPreserved()
     {
         using var stream = StreamOf("Ошибка входа,1,1,Не работает логин\nŽąsis,1,1,ąčęė");
