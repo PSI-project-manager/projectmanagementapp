@@ -1,6 +1,7 @@
 using Api.Data;
 using Api.Dtos;
 using Api.Models;
+using Api.Pagination;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,20 +22,7 @@ public class ItemService(
         CancellationToken ct = default
     )
     {
-        var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
-
-        if (
-            !projectExists
-            || !await projectService.CanAccessAsync(
-                projectId,
-                currentUserId,
-                currentUserIsAdmin,
-                ct
-            )
-        )
-        {
-            throw new KeyNotFoundException($"Project '{projectId}' was not found.");
-        }
+        await EnsureProjectAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct);
 
         return await db
             .Items.AsNoTracking()
@@ -53,6 +41,29 @@ public class ItemService(
             .ToListAsync(ct);
     }
 
+    public async Task<Page<ItemDto>> GetItemsPageAsync(
+        int projectId,
+        int currentUserId,
+        bool currentUserIsAdmin,
+        int pageNumber = 1,
+        int pageSize = 20,
+        CancellationToken ct = default
+    )
+    {
+        await EnsureProjectAccessAsync(projectId, currentUserId, currentUserIsAdmin, ct);
+
+        var query = db
+            .Items.AsNoTracking()
+            .Include(i => i.Itemtype)
+            .Include(i => i.Status)
+            .Where(i => i.Projectid == projectId)
+            .OrderByDescending(i => i.Itemid);
+
+        var page = await Page<Item>.FromQueryAsync(query, pageNumber, pageSize, ct);
+
+        return page.Map(ItemDto.FromEntity); // Page<Item> -> Page<ItemDto>
+    }
+
     public async Task<ItemDto> CreateAsync(
         CreateItemRequest request,
         int currentUserId,
@@ -62,21 +73,7 @@ public class ItemService(
     {
         await createValidator.ValidateAndThrowAsync(request, ct);
 
-        var projectExists = await db.Projects.AnyAsync(p => p.Projectid == request.ProjectId, ct);
-
-        // same response as a missing project so we don't leak which ids exist
-        if (
-            !projectExists
-            || !await projectService.CanAccessAsync(
-                request.ProjectId,
-                currentUserId,
-                currentUserIsAdmin,
-                ct
-            )
-        )
-        {
-            throw new KeyNotFoundException($"Project '{request.ProjectId}' was not found.");
-        }
+        await EnsureProjectAccessAsync(request.ProjectId, currentUserId, currentUserIsAdmin, ct);
 
         await itemTypeService.EnsureAssignableAsync(request.ItemTypeId, null, ct);
         await statusService.EnsureAssignableAsync(request.StatusId, null, ct);
@@ -94,5 +91,28 @@ public class ItemService(
         await db.SaveChangesAsync(ct);
 
         return ItemDto.FromEntity(item);
+    }
+
+    private async Task EnsureProjectAccessAsync(
+        int projectId,
+        int currentUserId,
+        bool currentUserIsAdmin,
+        CancellationToken ct
+    )
+    {
+        var projectExists = await db.Projects.AnyAsync(p => p.Projectid == projectId, ct);
+
+        if (
+            !projectExists
+            || !await projectService.CanAccessAsync(
+                projectId,
+                currentUserId,
+                currentUserIsAdmin,
+                ct
+            )
+        )
+        {
+            throw new KeyNotFoundException($"Project '{projectId}' was not found.");
+        }
     }
 }
