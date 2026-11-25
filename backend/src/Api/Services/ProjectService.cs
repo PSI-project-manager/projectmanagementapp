@@ -2,6 +2,7 @@ using Api.Data;
 using Api.Dtos;
 using Api.Exceptions;
 using Api.Models;
+using Api.Pagination;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,31 @@ public class ProjectService(
     IValidator<UpdateProjectRequest> updateValidator
 )
 {
+    public async Task<Page<ProjectDto>> ListPageAsync(
+        int currentUserId,
+        bool currentUserIsAdmin,
+        int pageNumber = 1,
+        int pageSize = 20,
+        CancellationToken ct = default
+    )
+    {
+        var query = db.Projects.AsNoTracking();
+
+        if (!currentUserIsAdmin)
+        {
+            query = query.Where(p => p.Projectusers.Any(pu => pu.Userid == currentUserId));
+        }
+
+        var page = await Page<Project>.FromQueryAsync(
+            query.OrderBy(p => p.Name),
+            pageNumber,
+            pageSize,
+            ct
+        );
+
+        return page.Map(ProjectDto.FromEntity);
+    }
+
     public async Task<IReadOnlyList<ProjectDto>> ListAsync(
         int currentUserId,
         bool currentUserIsAdmin,
