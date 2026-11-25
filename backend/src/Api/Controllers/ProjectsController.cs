@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Api.Dtos;
+using Api.Pagination;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +72,23 @@ public class ProjectsController(ProjectService projectService) : ControllerBase
         var users = await projectService.ListUsersAsync(id, cancellationToken);
         return Ok(users);
     }
+
+    [HttpGet("paged")]
+    [Authorize(Roles = "Admin, Contributor")]
+    public async Task<ActionResult<Page<ProjectDto>>> ListPaged(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default
+    ) =>
+        Ok(
+            await projectService.ListPageAsync(
+                CurrentUserId,
+                CurrentUserIsAdmin,
+                pageNumber,
+                pageSize,
+                cancellationToken
+            )
+        );
 
     [HttpPost("{id:int}/users")]
     [Authorize(Roles = "Admin")]
