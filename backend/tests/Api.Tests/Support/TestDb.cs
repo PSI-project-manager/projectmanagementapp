@@ -54,6 +54,22 @@ public sealed class TestDb
         );
     }
 
+    /// <summary>Real ItemTypeService with real validators.</summary>
+    public ItemTypeService CreateItemTypeService() =>
+        new(
+            CreateContext(),
+            new CreateItemTypeRequestValidator(),
+            new UpdateItemTypeRequestValidator()
+        );
+
+    /// <summary>Real StatusService with real validators.</summary>
+    public StatusService CreateStatusService() =>
+        new(
+            CreateContext(),
+            new CreateStatusRequestValidator(),
+            new UpdateStatusRequestValidator()
+        );
+
     /// <summary>
     /// Mirrors the registrations in Program.cs. ItemImportService needs a real
     /// IServiceScopeFactory because it opens one scope (and one DbContext) per CSV row.
@@ -129,13 +145,13 @@ public sealed class TestDb
         return itemType.Itemtypeid;
     }
 
-    public int AddStatus(string name, bool isActive = true)
+    public int AddStatus(string name, bool isActive = true, int sortOrder = 1)
     {
         using var context = CreateContext();
         var status = new Status
         {
             Name = name,
-            Sortorder = 1,
+            Sortorder = sortOrder,
             Isactive = true,
         };
         context.Statuses.Add(status);
