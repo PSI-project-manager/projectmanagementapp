@@ -86,13 +86,18 @@ public class TestData(ApiFactory factory)
             return type;
         });
 
-    public Task<Status> CreateStatusAsync(string? name = null, bool isActive = true) =>
+    public Task<Status> CreateStatusAsync(
+        string? name = null,
+        bool isActive = true,
+        int sortOrder = 0
+    ) =>
         WithDbAsync(async db =>
         {
             var status = new Status
             {
                 Name = name ?? $"Status {Interlocked.Increment(ref counter)}",
                 Isactive = isActive,
+                Sortorder = sortOrder,
             };
             db.Statuses.Add(status);
             await db.SaveChangesAsync();
